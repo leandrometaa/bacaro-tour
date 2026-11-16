@@ -13,6 +13,7 @@ import { isVenueOpenNow } from '../utils/openingHours';
 interface AppContextValue {
   center: [number, number];
   locationName: string;
+  onChangeLocation: () => void;
   radius: number;
   setRadius: (r: number) => void;
   openNow: boolean;
@@ -33,10 +34,12 @@ const AppContext = createContext<AppContextValue | null>(null);
 export function AppProvider({
   center,
   locationName,
+  onChangeLocation,
   children,
 }: {
   center: [number, number];
   locationName: string;
+  onChangeLocation: () => void;
   children: ReactNode;
 }) {
   const [radius, setRadius] = useState(5);
@@ -67,6 +70,7 @@ export function AppProvider({
       value={{
         center,
         locationName,
+        onChangeLocation,
         radius,
         setRadius,
         openNow,

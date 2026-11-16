@@ -1,4 +1,4 @@
-import { Search } from 'lucide-react';
+import { MapPin, Search } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FilterChips } from '../components/FilterChips';
@@ -15,6 +15,7 @@ export function MapPage() {
   const {
     center,
     locationName,
+    onChangeLocation,
     radius,
     setRadius,
     openNow,
@@ -138,18 +139,25 @@ export function MapPage() {
       <LoadingOverlay loading={loading} error={error} onRetry={retry} />
 
       <div className="absolute bottom-20 left-3 right-3 z-10">
-        <div className="bg-white/95 backdrop-blur-sm rounded-xl px-4 py-2 shadow-lg border border-surface-200">
-          <p className="text-sm text-surface-600">
+        <div className="bg-white/95 backdrop-blur-sm rounded-xl px-4 py-2 shadow-lg border border-surface-200 flex items-center justify-between gap-2">
+          <p className="text-sm text-surface-600 min-w-0">
             <span className="font-semibold text-brand-600">
               {localiTrovati(filteredVenues.length)}
             </span>
-            {locationName && (
-              <span className="text-surface-400"> vicino a {locationName}</span>
-            )}
             {mode === 'demo' && (
               <span className="ml-2 text-xs text-brand-500">(demo)</span>
             )}
           </p>
+          {locationName && (
+            <button
+              type="button"
+              onClick={onChangeLocation}
+              className="shrink-0 inline-flex items-center gap-1.5 text-sm text-brand-600 hover:text-brand-700 font-medium"
+            >
+              <MapPin size={16} />
+              <span className="truncate max-w-[10rem]">{locationName}</span>
+            </button>
+          )}
         </div>
       </div>
     </div>

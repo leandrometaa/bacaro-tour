@@ -46,9 +46,9 @@ export function SaveToListModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center">
-      <div className="bg-white rounded-t-2xl w-full max-w-lg max-h-[70vh] overflow-hidden animate-slide-up">
-        <div className="flex items-center justify-between p-4 border-b border-surface-200">
+    <div className="fixed inset-0 bg-black/50 z-[70] flex items-end justify-center">
+      <div className="bg-white rounded-t-2xl w-full max-w-lg max-h-[70vh] flex flex-col overflow-hidden animate-slide-up">
+        <div className="flex items-center justify-between p-4 border-b border-surface-200 shrink-0">
           <h2 className="text-lg font-semibold text-brand-ink">
             Salva in una lista
           </h2>
@@ -61,7 +61,7 @@ export function SaveToListModal({
           </button>
         </div>
 
-        <div className="p-4 space-y-2 overflow-y-auto max-h-[50vh]">
+        <div className="p-4 space-y-2 overflow-y-auto flex-1 min-h-0">
           {lists.map((list) => {
             const inList = isInList(list.id, venueId);
             return (

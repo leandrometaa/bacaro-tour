@@ -57,9 +57,9 @@ export function AddVisitModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center">
-      <div className="bg-white rounded-t-2xl w-full max-w-lg max-h-[85vh] overflow-hidden animate-slide-up">
-        <div className="flex items-center justify-between p-4 border-b border-surface-200">
+    <div className="fixed inset-0 bg-black/50 z-[70] flex items-end justify-center">
+      <div className="bg-white rounded-t-2xl w-full max-w-lg max-h-[85vh] flex flex-col overflow-hidden animate-slide-up">
+        <div className="flex items-center justify-between p-4 border-b border-surface-200 shrink-0">
           <div>
             <h2 className="text-lg font-semibold text-brand-ink">
               Ci sono stato
@@ -75,7 +75,7 @@ export function AddVisitModal({
           </button>
         </div>
 
-        <div className="p-4 space-y-5 overflow-y-auto max-h-[65vh]">
+        <div className="p-4 space-y-5 overflow-y-auto flex-1 min-h-0">
           <div>
             <label className="block text-sm font-medium text-surface-700 mb-2">
               Data della visita
@@ -156,7 +156,7 @@ export function AddVisitModal({
           </div>
         </div>
 
-        <div className="p-4 border-t border-surface-200">
+        <div className="p-4 border-t border-surface-200 shrink-0 sticky bottom-0 bg-white">
           <button
             type="button"
             onClick={handleSubmit}

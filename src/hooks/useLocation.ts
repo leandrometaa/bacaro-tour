@@ -73,6 +73,16 @@ export function useLocation() {
     });
   }, []);
 
+  const clearLocation = useCallback(() => {
+    setState({
+      coordinates: null,
+      locationName: null,
+      loading: false,
+      error: null,
+      permissionDenied: false,
+    });
+  }, []);
+
   useEffect(() => {
     requestLocation();
   }, [requestLocation]);
@@ -81,5 +91,6 @@ export function useLocation() {
     ...state,
     requestLocation,
     setManualLocation,
+    clearLocation,
   };
 }

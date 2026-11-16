@@ -17,10 +17,8 @@ function App() {
     permissionDenied,
     requestLocation,
     setManualLocation,
+    clearLocation,
   } = useLocation();
-
-  const showLocationPicker =
-    !coordinates && (loading || permissionDenied || error);
 
   if (loading && !permissionDenied && !error) {
     return (
@@ -33,7 +31,7 @@ function App() {
     );
   }
 
-  if (showLocationPicker || !coordinates) {
+  if (!coordinates) {
     return (
       <LocationPicker
         onLocationSelect={(coords, name) => setManualLocation(coords, name)}
@@ -51,6 +49,7 @@ function App() {
       <AppProvider
         center={coordinates}
         locationName={locationName || 'La tua posizione'}
+        onChangeLocation={clearLocation}
       >
         <div className="h-screen flex flex-col bg-surface-50">
           <Routes>

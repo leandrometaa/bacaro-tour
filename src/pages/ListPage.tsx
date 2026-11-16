@@ -1,4 +1,4 @@
-import { Search } from 'lucide-react';
+import { MapPin, Search } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { FilterChips } from '../components/FilterChips';
 import { LoadingOverlay } from '../components/LoadingOverlay';
@@ -14,6 +14,7 @@ import { isVenueOpenNow } from '../utils/openingHours';
 export function ListPage() {
   const {
     locationName,
+    onChangeLocation,
     radius,
     setRadius,
     openNow,
@@ -104,21 +105,30 @@ export function ListPage() {
           </>
         )}
 
-        <div className="text-sm text-surface-500">
-          {isSearching ? (
-            <>
-              <span className="font-semibold text-brand-600">
-                {risultatiCount(displayedVenues.length)}
-              </span>{' '}
-              per &quot;{searchQuery}&quot;
-            </>
-          ) : (
-            <>
+        <div className="flex items-center justify-between gap-2 text-sm text-surface-500">
+          <div className="min-w-0">
+            {isSearching ? (
+              <>
+                <span className="font-semibold text-brand-600">
+                  {risultatiCount(displayedVenues.length)}
+                </span>{' '}
+                per &quot;{searchQuery}&quot;
+              </>
+            ) : (
               <span className="font-semibold text-brand-600">
                 {localiCount(displayedVenues.length)}
               </span>
-              {locationName && ` vicino a ${locationName}`}
-            </>
+            )}
+          </div>
+          {!isSearching && locationName && (
+            <button
+              type="button"
+              onClick={onChangeLocation}
+              className="shrink-0 inline-flex items-center gap-1.5 text-brand-600 hover:text-brand-700 font-medium"
+            >
+              <MapPin size={16} />
+              <span className="truncate max-w-[10rem]">{locationName}</span>
+            </button>
           )}
         </div>
       </div>
