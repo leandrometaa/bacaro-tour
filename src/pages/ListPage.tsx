@@ -181,10 +181,10 @@ export function ListPage() {
           <>
             {activeFilterCount > 0 && (
               <div className="flex flex-wrap gap-1.5">
-                {radius !== 5 && (
+                {radius !== 3 && (
                   <button
                     type="button"
-                    onClick={() => setRadius(5)}
+                    onClick={() => setRadius(3)}
                     className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-elev text-ink font-medium"
                   >
                     {radius} km <X size={12} />

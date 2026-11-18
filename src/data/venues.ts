@@ -7,10 +7,12 @@ import { applyEnrichment, applyEnrichmentToAll } from './enrichment';
 import {
   fetchOsmVenueById,
   fetchOsmVenues,
+  VENUE_DISPLAY_CAP,
   type OsmFetchResult,
 } from './overpass';
 import { QUICK_CITIES } from './quickCities';
 import { findBundledVenueById, mergeRegionalVenues } from './regional';
+import { haversineKm } from '../utils/geo';
 
 export { QUICK_CITIES };
 export { osmEditUrl, osmNoteUrl } from './overpass';
@@ -27,12 +29,31 @@ export function getSessionVenues(): Venue[] {
   return osmSessionCache;
 }
 
+function prioritizeAndCap(
+  venues: Venue[],
+  center: [number, number]
+): { venues: Venue[]; truncated: boolean } {
+  const scored = [...venues].sort((a, b) => {
+    // Prefer venues with hours, then contacts, then nearer.
+    const score = (v: Venue) =>
+      (v.hasHours ? 4 : 0) +
+      (v.phone ? 1 : 0) +
+      (v.website ? 1 : 0);
+    const d = score(b) - score(a);
+    if (d !== 0) return d;
+    return haversineKm(center, a.coordinates) - haversineKm(center, b.coordinates);
+  });
+  const truncated = scored.length > VENUE_DISPLAY_CAP;
+  return { venues: scored.slice(0, VENUE_DISPLAY_CAP), truncated };
+}
+
 /** Instant regional/Overture pool for the current area (no network). */
 export function peekRegionalVenues(
   center: [number, number],
   radiusKm: number
 ): Venue[] {
-  return applyEnrichmentToAll(mergeRegionalVenues([], center, radiusKm));
+  const merged = applyEnrichmentToAll(mergeRegionalVenues([], center, radiusKm));
+  return prioritizeAndCap(merged, center).venues;
 }
 
 export async function loadVenues(
@@ -42,19 +63,25 @@ export async function loadVenues(
 ): Promise<OsmFetchResult> {
   try {
     const result = await fetchOsmVenues(center, radiusKm, options);
-    const merged = mergeRegionalVenues(result.venues, center, radiusKm);
-    const venues = applyEnrichmentToAll(merged);
-    setSessionVenues(venues);
-    return { ...result, venues };
+    const merged = applyEnrichmentToAll(
+      mergeRegionalVenues(result.venues, center, radiusKm)
+    );
+    const capped = prioritizeAndCap(merged, center);
+    setSessionVenues(capped.venues);
+    return {
+      ...result,
+      venues: capped.venues,
+      truncated: result.truncated || capped.truncated,
+    };
   } catch (err) {
     if (err instanceof DOMException && err.name === 'AbortError') throw err;
 
     // Offline / Overpass down: still serve regional + Overture bundles.
-    const venues = peekRegionalVenues(center, radiusKm);
-    if (venues.length === 0) throw err;
-
-    setSessionVenues(venues);
-    return { venues, truncated: false, stale: true };
+    const merged = applyEnrichmentToAll(mergeRegionalVenues([], center, radiusKm));
+    if (merged.length === 0) throw err;
+    const capped = prioritizeAndCap(merged, center);
+    setSessionVenues(capped.venues);
+    return { venues: capped.venues, truncated: capped.truncated, stale: true };
   }
 }
 

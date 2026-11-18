@@ -86,7 +86,7 @@ export function FilterChips({
         }`}
       >
         <Clock size={16} />
-        Aperti / orario n/d
+        Aperto adesso
       </button>
 
       {MOODS.map((mood) => (

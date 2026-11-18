@@ -67,7 +67,7 @@ export function AppProvider({
   children: ReactNode;
 }) {
   const [queryCenter, setQueryCenter] = useState<[number, number]>(userCenter);
-  const [radius, setRadius] = useState(5);
+  const [radius, setRadius] = useState(3);
   const [openNow, setOpenNow] = useState(false);
   const [selectedMoods, setSelectedMoods] = useState<Mood[]>([]);
   const [selectedFeatures, setSelectedFeatures] = useState<FeatureFilterId[]>(
@@ -132,7 +132,7 @@ export function AppProvider({
     setSelectedFeatures([]);
     setHideVisited(false);
     setOnlyToTry(false);
-    setRadius(5);
+    setRadius(3);
   }, []);
 
   const activeFilterCount =
@@ -141,16 +141,14 @@ export function AppProvider({
     selectedFeatures.length +
     (hideVisited ? 1 : 0) +
     (onlyToTry ? 1 : 0) +
-    (radius !== 5 ? 1 : 0);
+    (radius !== 3 ? 1 : 0);
 
   const filteredVenues = useMemo(() => {
     let result = venues;
 
     if (openNow) {
-      // Keep open venues and those without hours (unknown ≠ closed).
-      result = result.filter(
-        (v) => !v.hasHours || isVenueOpenNow(v, now)
-      );
+      // Strict: only venues that are known open right now.
+      result = result.filter((v) => v.hasHours && isVenueOpenNow(v, now));
     }
 
     if (selectedMoods.length) {

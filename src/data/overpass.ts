@@ -4,17 +4,21 @@ import { buildWeeklyHours } from '../utils/openingHours';
 import { venueTypeLabel } from '../utils/typeLabels';
 import { normalizeWebsiteUrl } from '../utils/url';
 
+/** Prefer our Vercel proxy; fall back to public mirrors from the browser. */
 const OVERPASS_ENDPOINTS = [
+  '/api/overpass',
   'https://overpass-api.de/api/interpreter',
   'https://overpass.openstreetmap.fr/api/interpreter',
 ];
 
 const MAX_RESULTS = 150;
+/** Soft cap after merge so maps stay usable in dense cities. */
+export const VENUE_DISPLAY_CAP = 200;
 /**
  * Per-endpoint budget. UI already paints the offline peek, so we can wait
  * longer for a real Overpass response instead of always falling back.
  */
-const CLIENT_TIMEOUT_MS = 20_000;
+const CLIENT_TIMEOUT_MS = 22_000;
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const CACHE_PREFIX = 'bacaro_tour_osm_';
 const CACHE_VERSION = 2;
@@ -228,14 +232,20 @@ async function fetchOneOverpass(
     CLIENT_TIMEOUT_MS
   );
 
+  const viaProxy = endpoint.startsWith('/');
+
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Accept: 'application/json',
-      },
-      body: `data=${encodeURIComponent(query)}`,
+      headers: viaProxy
+        ? { 'Content-Type': 'application/json', Accept: 'application/json' }
+        : {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Accept: 'application/json',
+          },
+      body: viaProxy
+        ? JSON.stringify({ query })
+        : `data=${encodeURIComponent(query)}`,
       signal: timeoutController.signal,
     });
 
@@ -243,7 +253,12 @@ async function fetchOneOverpass(
       throw new Error(`Overpass HTTP ${response.status}`);
     }
 
-    const data = (await response.json()) as OverpassResponse;
+    const data = (await response.json()) as OverpassResponse & {
+      error?: string;
+    };
+    if (data.error && !data.elements) {
+      throw new Error(data.error);
+    }
     const elements = data.elements ?? [];
     const remark = data.remark;
     if (elements.length === 0 && isBadRemark(remark)) {
@@ -266,7 +281,6 @@ async function fetchOneOverpass(
   }
 }
 
-/** Race mirrors in parallel — first usable response wins. */
 async function fetchOverpass(
   query: string,
   signal?: AbortSignal
@@ -275,21 +289,47 @@ async function fetchOverpass(
     throw new DOMException('Aborted', 'AbortError');
   }
 
+  const [proxy, ...mirrors] = OVERPASS_ENDPOINTS;
+
+  // Prefer Vercel proxy (more reliable than browser→Overpass).
+  try {
+    return await fetchOneOverpass(proxy, query, signal);
+  } catch (err) {
+    if (err instanceof DOMException && err.name === 'AbortError' && signal?.aborted) {
+      throw err;
+    }
+  }
+
   const errors: Error[] = [];
   const shared = new AbortController();
   const onParentAbort = () => shared.abort();
   signal?.addEventListener('abort', onParentAbort, { once: true });
 
   try {
-    const result = await Promise.any(
-      OVERPASS_ENDPOINTS.map((endpoint) =>
-        fetchOneOverpass(endpoint, query, shared.signal).catch((err) => {
-          if (err instanceof Error) errors.push(err);
-          throw err;
-        })
-      )
-    );
-    shared.abort();
+    const result = await new Promise<OverpassFetchOk>((resolve, reject) => {
+      let pending = mirrors.length;
+      if (pending === 0) {
+        reject(new Error('Overpass non raggiungibile'));
+        return;
+      }
+      for (const endpoint of mirrors) {
+        void fetchOneOverpass(endpoint, query, shared.signal).then(
+          (ok) => {
+            shared.abort();
+            resolve(ok);
+          },
+          (err) => {
+            if (err instanceof Error) errors.push(err);
+            pending -= 1;
+            if (pending === 0) {
+              reject(
+                errors[0] ?? new Error('Overpass non raggiungibile')
+              );
+            }
+          }
+        );
+      }
+    });
     return result;
   } catch (err) {
     if (signal?.aborted) {
@@ -298,10 +338,7 @@ async function fetchOverpass(
     if (err instanceof DOMException && err.name === 'AbortError') {
       throw err;
     }
-    throw (
-      errors[0] ??
-      (err instanceof Error ? err : new Error('Overpass non raggiungibile'))
-    );
+    throw err instanceof Error ? err : new Error('Overpass non raggiungibile');
   } finally {
     signal?.removeEventListener('abort', onParentAbort);
   }
