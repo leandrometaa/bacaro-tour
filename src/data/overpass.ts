@@ -77,7 +77,7 @@ interface OverpassResponse {
   remark?: string;
 }
 
-interface OsmElement {
+export interface OsmElement {
   type: 'node' | 'way' | 'relation';
   id: number;
   lat?: number;
@@ -603,6 +603,25 @@ function elementToVenue(el: OsmElement): Venue | null {
     hasHours: Boolean(openingHoursRaw),
     source: 'osm',
   };
+}
+
+/**
+ * Map cached OSM/Overture tags (e.g. from Supabase) into the app Venue shape.
+ * Reuses the same parsing as live Overpass elements.
+ */
+export function venueFromOsmElement(
+  el: OsmElement,
+  options?: { source?: 'osm' | 'overture'; id?: string }
+): Venue | null {
+  const venue = elementToVenue(el);
+  if (!venue) return null;
+  if (options?.source === 'overture') {
+    venue.source = 'overture';
+    venue.osmType = undefined;
+    venue.osmId = undefined;
+  }
+  if (options?.id) venue.id = options.id;
+  return venue;
 }
 
 export async function fetchOsmVenues(

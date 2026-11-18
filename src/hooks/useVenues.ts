@@ -39,6 +39,13 @@ export function useVenues({
         const result = await loadVenues(center, radiusKm, {
           force,
           signal: controller.signal,
+          onPartial: (partial) => {
+            if (id !== requestId.current) return;
+            setVenues(partial.venues);
+            setTruncated(partial.truncated);
+            setStale(Boolean(partial.stale));
+            setError(null);
+          },
         });
         if (id !== requestId.current) return;
         setVenues(result.venues);

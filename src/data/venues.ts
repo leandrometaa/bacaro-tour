@@ -12,6 +12,7 @@ import {
 } from './overpass';
 import { QUICK_CITIES } from './quickCities';
 import { findBundledVenueById, mergeRegionalVenues } from './regional';
+import { fetchSupabaseVenues } from './supabaseVenues';
 import { haversineKm } from '../utils/geo';
 
 export { QUICK_CITIES };
@@ -47,6 +48,23 @@ function prioritizeAndCap(
   return { venues: scored.slice(0, VENUE_DISPLAY_CAP), truncated };
 }
 
+function finalizeResult(
+  live: OsmFetchResult,
+  center: [number, number],
+  radiusKm: number
+): OsmFetchResult {
+  const merged = applyEnrichmentToAll(
+    mergeRegionalVenues(live.venues, center, radiusKm)
+  );
+  const capped = prioritizeAndCap(merged, center);
+  setSessionVenues(capped.venues);
+  return {
+    ...live,
+    venues: capped.venues,
+    truncated: live.truncated || capped.truncated,
+  };
+}
+
 /** Instant regional/Overture pool for the current area (no network). */
 export function peekRegionalVenues(
   center: [number, number],
@@ -59,24 +77,51 @@ export function peekRegionalVenues(
 export async function loadVenues(
   center: [number, number],
   radiusKm: number,
-  options?: { force?: boolean; signal?: AbortSignal }
+  options?: {
+    force?: boolean;
+    signal?: AbortSignal;
+    /** Progressive upgrade: offline → Supabase → live Overpass. */
+    onPartial?: (result: OsmFetchResult) => void;
+  }
 ): Promise<OsmFetchResult> {
+  let liveSettled = false;
+
+  const emitPartial = (result: OsmFetchResult) => {
+    if (liveSettled) return;
+    if (options?.signal?.aborted) return;
+    options?.onPartial?.(result);
+  };
+
+  // Fire Supabase in parallel; never block the Overpass path on it.
+  const supabasePromise = fetchSupabaseVenues(center, radiusKm, {
+    signal: options?.signal,
+  })
+    .then((cached) => {
+      if (!cached || cached.venues.length === 0) return null;
+      // Live Overpass already won — do not clobber session cache.
+      if (liveSettled || options?.signal?.aborted) return null;
+      const result = finalizeResult(cached, center, radiusKm);
+      emitPartial(result);
+      return result;
+    })
+    .catch((err) => {
+      if (err instanceof DOMException && err.name === 'AbortError') throw err;
+      return null;
+    });
+
   try {
     const result = await fetchOsmVenues(center, radiusKm, options);
-    const merged = applyEnrichmentToAll(
-      mergeRegionalVenues(result.venues, center, radiusKm)
-    );
-    const capped = prioritizeAndCap(merged, center);
-    setSessionVenues(capped.venues);
-    return {
-      ...result,
-      venues: capped.venues,
-      truncated: result.truncated || capped.truncated,
-    };
+    liveSettled = true;
+    return finalizeResult(result, center, radiusKm);
   } catch (err) {
     if (err instanceof DOMException && err.name === 'AbortError') throw err;
 
-    // Offline / Overpass down: still serve regional + Overture bundles.
+    const fromSupabase = await supabasePromise;
+    if (fromSupabase && fromSupabase.venues.length > 0) {
+      return fromSupabase;
+    }
+
+    // Offline packs as last resort when Overpass + Supabase both fail.
     const merged = applyEnrichmentToAll(mergeRegionalVenues([], center, radiusKm));
     if (merged.length === 0) throw err;
     const capped = prioritizeAndCap(merged, center);
