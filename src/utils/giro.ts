@@ -185,7 +185,11 @@ export function loadGiroPlan(
     const ordered: Venue[] = [];
     for (const id of saved.venueIds) {
       const v = byId.get(id);
-      if (!v) return null;
+      if (!v) {
+        // Stale draft (ids from another session/zone) — drop it so a fresh giro can build.
+        clearSavedGiro();
+        return null;
+      }
       ordered.push(v);
     }
     return planFromVenues(center, ordered, at);

@@ -51,18 +51,27 @@ export function GiroSheet({
 
   useEffect(() => {
     if (!open) return;
+
+    // Wait for the venue pool — opening the sheet during Overpass/peek race
+    // used to leave a permanent "Giro non disponibile" until manual regenerate.
+    if (venues.length < 3) {
+      if (!loading) setPlan(null);
+      return;
+    }
+
     const saved = loadGiroPlan(center, venues, now);
     if (saved) {
       setStopCount(saved.stops.length);
       setPlan(saved);
       return;
     }
+
     const fresh = buildGiro(center, venues, stopCount, now);
     setPlan(fresh);
     if (fresh) saveGiroPlan(center, fresh);
-    // Only hydrate when the sheet opens.
+    // stopCount is applied via regenerate / handleStopCount — not here.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, center, venues]);
+  }, [open, center, venues, loading, now]);
 
   useEffect(() => {
     if (!swapHint) return;
@@ -180,7 +189,7 @@ export function GiroSheet({
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 min-h-0">
-          {loading && venues.length === 0 ? (
+          {loading && venues.length < 3 ? (
             <p className="text-center text-muted py-12">Caricamento locali…</p>
           ) : !plan ? (
             <EmptyState
