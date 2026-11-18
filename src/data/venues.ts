@@ -27,6 +27,14 @@ export function getSessionVenues(): Venue[] {
   return osmSessionCache;
 }
 
+/** Instant regional/Overture pool for the current area (no network). */
+export function peekRegionalVenues(
+  center: [number, number],
+  radiusKm: number
+): Venue[] {
+  return applyEnrichmentToAll(mergeRegionalVenues([], center, radiusKm));
+}
+
 export async function loadVenues(
   center: [number, number],
   radiusKm: number,
@@ -42,8 +50,7 @@ export async function loadVenues(
     if (err instanceof DOMException && err.name === 'AbortError') throw err;
 
     // Offline / Overpass down: still serve regional + Overture bundles.
-    const merged = mergeRegionalVenues([], center, radiusKm);
-    const venues = applyEnrichmentToAll(merged);
+    const venues = peekRegionalVenues(center, radiusKm);
     if (venues.length === 0) throw err;
 
     setSessionVenues(venues);

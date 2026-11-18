@@ -7,11 +7,11 @@ import { normalizeWebsiteUrl } from '../utils/url';
 const OVERPASS_ENDPOINTS = [
   'https://overpass.openstreetmap.fr/api/interpreter',
   'https://overpass-api.de/api/interpreter',
-  'https://overpass.kumi.systems/api/interpreter',
 ];
 
 const MAX_RESULTS = 150;
-const CLIENT_TIMEOUT_MS = 28_000;
+/** Per-endpoint budget: fail fast so UI can refresh after the regional peek. */
+const CLIENT_TIMEOUT_MS = 6_000;
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const CACHE_PREFIX = 'bacaro_tour_osm_';
 const CACHE_VERSION = 2;

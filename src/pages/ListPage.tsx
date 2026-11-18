@@ -134,8 +134,8 @@ export function ListPage() {
   };
 
   return (
-    <div className="flex flex-col h-full pb-[calc(4.5rem+env(safe-area-inset-bottom))] bg-app relative">
-      <div className="sticky top-0 z-10 p-3 space-y-2 bg-card border-b border-line">
+    <div className="flex flex-col h-full pb-[calc(4.5rem+env(safe-area-inset-bottom))] bg-app relative overflow-x-hidden w-full max-w-full">
+      <div className="sticky top-0 z-10 p-3 space-y-2 bg-card border-b border-line w-full max-w-full overflow-x-hidden">
         <div className="flex gap-2">
           <div className="relative flex-1">
             <Search
@@ -297,7 +297,7 @@ export function ListPage() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-3 pb-6 relative">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 pb-6 relative w-full max-w-full">
         <LoadingOverlay
           loading={loading && venues.length > 0}
           error={error}
@@ -383,7 +383,7 @@ export function ListPage() {
           />
         ) : (
           <div className="space-y-3">
-            <div className="grid gap-0 bg-card rounded-xl border border-line px-3">
+            <div className="grid gap-0 bg-card rounded-xl border border-line px-3 overflow-hidden min-w-0 w-full">
               {pageVenues.map((venue) => (
                 <VenueCard
                   key={venue.id}

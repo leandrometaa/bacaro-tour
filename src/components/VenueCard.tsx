@@ -64,8 +64,7 @@ export function VenueCard({
   const typeLabel = venueTypeLabel(venue.type);
   const cuisine = venue.cuisine?.[0]?.trim();
   const place = venuePlaceLabel(venue, {
-    center:
-      center ?? (distanceKm != null ? undefined : null),
+    center: center ?? (distanceKm != null ? undefined : null),
   });
 
   const subtitle = [typeLabel, cuisine].filter(Boolean).join(' · ');
@@ -74,22 +73,26 @@ export function VenueCard({
   return (
     <Link
       to={`/locale/${venue.id}`}
-      className="flex gap-3 items-start py-3.5 border-b border-line last:border-b-0 hover:bg-elev/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+      className="flex gap-2.5 items-start py-3.5 border-b border-line last:border-b-0 hover:bg-elev/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset min-w-0 w-full overflow-hidden"
     >
-      <div className="min-w-0 flex-1">
-        <div className="flex items-baseline gap-2 min-w-0">
-          <h3 className="font-display text-[1.15rem] leading-snug text-ink truncate">
+      <div className="min-w-0 flex-1 overflow-hidden">
+        <div className="flex items-start gap-2 min-w-0">
+          <h3 className="font-display text-[1.1rem] leading-snug text-ink min-w-0 flex-1 break-words">
             {venue.name}
           </h3>
           <span
-            className={`shrink-0 text-[10px] font-semibold tracking-wide uppercase px-1.5 py-0.5 rounded-full ${pill.className}`}
+            className={`shrink-0 mt-0.5 text-[10px] font-semibold tracking-wide uppercase px-1.5 py-0.5 rounded-full whitespace-nowrap ${pill.className}`}
           >
             {pill.label}
           </span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5 min-w-0">
+          <p className="text-sm text-muted truncate min-w-0">{subtitle}</p>
           {isSaved && (
             <Heart
               size={13}
-              className="shrink-0 text-red-500 fill-red-500 translate-y-0.5"
+              className="shrink-0 text-red-500 fill-red-500"
               aria-label="Salvato"
             />
           )}
@@ -101,24 +104,22 @@ export function VenueCard({
           )}
         </div>
 
-        <p className="text-sm text-muted mt-0.5 truncate">{subtitle}</p>
-
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm text-subtle mt-1.5">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm text-subtle mt-1.5 min-w-0">
           {distanceKm != null && (
-            <span className="inline-flex items-center gap-1">
+            <span className="inline-flex items-center gap-1 shrink-0">
               <MapPin size={13} className="shrink-0 opacity-70" aria-hidden />
               {formatDistance(distanceKm)}
             </span>
           )}
           {distanceKm == null && place && (
-            <span className="inline-flex items-center gap-1 truncate">
+            <span className="inline-flex items-center gap-1 min-w-0 max-w-full">
               <MapPin size={13} className="shrink-0 opacity-70" aria-hidden />
               <span className="truncate">{place}</span>
             </span>
           )}
           {showHours && (
             <span
-              className={`inline-flex items-center gap-1 ${
+              className={`inline-flex items-center gap-1 min-w-0 ${
                 openingState === 'open' ? 'text-open' : 'text-closed'
               }`}
             >
@@ -155,11 +156,11 @@ export function VenueCard({
       </div>
 
       <div
-        className="shrink-0 flex flex-col items-center justify-start gap-1 w-12 text-center text-muted"
+        className="shrink-0 flex items-center justify-center w-9 h-9 rounded-lg bg-elev text-muted"
+        title={typeLabel}
         aria-hidden
       >
-        <TypeIcon size={22} strokeWidth={1.5} />
-        <span className="text-[10px] leading-tight text-subtle">{typeLabel}</span>
+        <TypeIcon size={20} strokeWidth={1.5} />
       </div>
     </Link>
   );

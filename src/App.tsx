@@ -58,12 +58,13 @@ function LocatedRoutes() {
   const onMap = pathname === '/' || pathname === '';
 
   return (
-    <div className="relative flex-1 min-h-0 flex flex-col">
+    <div className="relative flex-1 min-h-0 flex flex-col overflow-x-hidden w-full max-w-[100vw]">
+      {/* Keep map mounted; clip hard when hidden so Leaflet cannot widen the page. */}
       <div
         className={
           onMap
-            ? 'flex-1 min-h-0'
-            : 'absolute inset-0 invisible pointer-events-none'
+            ? 'relative flex-1 min-h-0 overflow-hidden'
+            : 'absolute inset-0 overflow-hidden max-w-full invisible pointer-events-none z-0'
         }
         aria-hidden={!onMap}
       >
@@ -73,15 +74,17 @@ function LocatedRoutes() {
       </div>
 
       {!onMap && (
-        <Suspense fallback={<PageFallback />}>
-          <Routes>
-            <Route path="lista" element={<ListPage />} />
-            <Route path="i-miei-posti" element={<MyPlacesPage />} />
-            <Route path="lista-salvata/:listId" element={<SavedListPage />} />
-            <Route path="giro" element={<Navigate to="/" replace />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Suspense>
+        <div className="relative z-10 flex-1 min-h-0 flex flex-col overflow-x-hidden w-full bg-app">
+          <Suspense fallback={<PageFallback />}>
+            <Routes>
+              <Route path="lista" element={<ListPage />} />
+              <Route path="i-miei-posti" element={<MyPlacesPage />} />
+              <Route path="lista-salvata/:listId" element={<SavedListPage />} />
+              <Route path="giro" element={<Navigate to="/" replace />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        </div>
       )}
     </div>
   );

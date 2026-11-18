@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { loadVenues } from '../data/venues';
+import { loadVenues, peekRegionalVenues } from '../data/venues';
 import type { Venue } from '../types';
 
 interface UseVenuesOptions {
@@ -76,9 +76,11 @@ export function useVenues({
     // Immediate fetch on first load / center change; debounce only radius tweaks
     const delay = centerChanged ? 0 : radiusDebounceMs;
     if (centerChanged) {
-      setVenues([]);
+      // Paint bundle venues immediately so the UI is not blank for ~Overpass timeout.
+      const quick = peekRegionalVenues(center, radiusKm);
+      setVenues(quick);
       setTruncated(false);
-      setStale(false);
+      setStale(quick.length > 0);
       setError(null);
       setLoading(true);
     } else if (delay === 0) {
