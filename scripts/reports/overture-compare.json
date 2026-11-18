@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-17T16:03:40.988Z",
+  "generatedAt": "2026-11-18T11:33:43.567Z",
   "release": "2026-10-21.0",
   "radiusKm": 5,
   "matchMeters": 80,
@@ -538,11 +538,11 @@
     },
     {
       "hub": "Vittorio Veneto",
-      "bundleCount": 0,
+      "bundleCount": 1,
       "overtureCount": 128,
       "matched": 0,
       "novel": 128,
-      "novelLiftPct": 100,
+      "novelLiftPct": 12800,
       "overtureCompleteness": {
         "phone": 123,
         "website": 62,
@@ -614,11 +614,11 @@
     },
     {
       "hub": "Valdobbiadene",
-      "bundleCount": 0,
+      "bundleCount": 18,
       "overtureCount": 369,
-      "matched": 0,
-      "novel": 369,
-      "novelLiftPct": 100,
+      "matched": 7,
+      "novel": 362,
+      "novelLiftPct": 2011,
       "overtureCompleteness": {
         "phone": 344,
         "website": 251,
@@ -626,16 +626,16 @@
         "websitePct": 68
       },
       "novelCompleteness": {
-        "phone": 344,
-        "website": 251,
+        "phone": 337,
+        "website": 247,
         "phonePct": 93,
         "websitePct": 68
       },
       "bundleCompleteness": {
-        "phone": 0,
-        "website": 0,
-        "phonePct": 0,
-        "websitePct": 0
+        "phone": 4,
+        "website": 3,
+        "phonePct": 22,
+        "websitePct": 17
       },
       "sampleNovel": [
         {
@@ -690,11 +690,11 @@
     },
     {
       "hub": "Asolo",
-      "bundleCount": 0,
+      "bundleCount": 20,
       "overtureCount": 165,
-      "matched": 0,
-      "novel": 165,
-      "novelLiftPct": 100,
+      "matched": 9,
+      "novel": 156,
+      "novelLiftPct": 780,
       "overtureCompleteness": {
         "phone": 156,
         "website": 90,
@@ -702,16 +702,16 @@
         "websitePct": 55
       },
       "novelCompleteness": {
-        "phone": 156,
-        "website": 90,
-        "phonePct": 95,
-        "websitePct": 55
+        "phone": 147,
+        "website": 85,
+        "phonePct": 94,
+        "websitePct": 54
       },
       "bundleCompleteness": {
-        "phone": 0,
-        "website": 0,
-        "phonePct": 0,
-        "websitePct": 0
+        "phone": 2,
+        "website": 1,
+        "phonePct": 10,
+        "websitePct": 5
       },
       "sampleNovel": [
         {
@@ -1070,11 +1070,11 @@
     },
     {
       "hub": "Marostica",
-      "bundleCount": 3,
+      "bundleCount": 43,
       "overtureCount": 208,
-      "matched": 0,
-      "novel": 208,
-      "novelLiftPct": 6933,
+      "matched": 13,
+      "novel": 195,
+      "novelLiftPct": 453,
       "overtureCompleteness": {
         "phone": 198,
         "website": 97,
@@ -1082,16 +1082,16 @@
         "websitePct": 47
       },
       "novelCompleteness": {
-        "phone": 198,
-        "website": 97,
+        "phone": 185,
+        "website": 90,
         "phonePct": 95,
-        "websitePct": 47
+        "websitePct": 46
       },
       "bundleCompleteness": {
-        "phone": 0,
-        "website": 0,
-        "phonePct": 0,
-        "websitePct": 0
+        "phone": 5,
+        "website": 3,
+        "phonePct": 12,
+        "websitePct": 7
       },
       "sampleNovel": [
         {
@@ -1143,12 +1143,164 @@
           "website": null
         }
       ]
+    },
+    {
+      "hub": "Verona",
+      "bundleCount": 0,
+      "overtureCount": 1669,
+      "matched": 0,
+      "novel": 1669,
+      "novelLiftPct": 100,
+      "overtureCompleteness": {
+        "phone": 1463,
+        "website": 877,
+        "phonePct": 88,
+        "websitePct": 53
+      },
+      "novelCompleteness": {
+        "phone": 1463,
+        "website": 877,
+        "phonePct": 88,
+        "websitePct": 53
+      },
+      "bundleCompleteness": {
+        "phone": 0,
+        "website": 0,
+        "phonePct": 0,
+        "websitePct": 0
+      },
+      "sampleNovel": [
+        {
+          "name": "La Vecia Diga",
+          "category": "restaurant",
+          "phone": "045 942209",
+          "website": "http://www.veciadiga.com"
+        },
+        {
+          "name": "Osteria Montresor",
+          "category": "restaurant",
+          "phone": "+390458905722",
+          "website": "http://www.osteriadamontresor.it/"
+        },
+        {
+          "name": "Bottagisio food & drink",
+          "category": "bar",
+          "phone": "+393533397525",
+          "website": "http://www.lollosgroup.com/"
+        },
+        {
+          "name": "Signorvino Verona",
+          "category": "restaurant",
+          "phone": "+390458890097",
+          "website": "https://www.signorvino.com/it/negozi/veneto/verona/verona_via_preare_15/B106.html?utm_source=facebook&utm_medium=organic&utm_campaign=local&utm_term=B106&y_source=1_MTQ4Njg4NjQtNTU5LWxvY2F0aW9uLndlYnNpdGU%3D"
+        },
+        {
+          "name": "McCafé",
+          "category": "coffee_shop",
+          "phone": null,
+          "website": "https://www.mcdonalds.it/ristorante/veneto/verona/verona-via-preare"
+        },
+        {
+          "name": "Burger King",
+          "category": "restaurant",
+          "phone": "3452436033",
+          "website": "https://www.burgerking.it/ristoranti/veneto/verona/burger-king-parona/"
+        },
+        {
+          "name": "Azienda Agricola San Dionigi",
+          "category": "winery",
+          "phone": "393393223074",
+          "website": "http://www.sandionigi.it/"
+        },
+        {
+          "name": "Dolce Gusto",
+          "category": "restaurant",
+          "phone": "+39045942474",
+          "website": "http://www.dolcegustoverona.com/"
+        }
+      ]
+    },
+    {
+      "hub": "Venezia",
+      "bundleCount": 0,
+      "overtureCount": 1409,
+      "matched": 0,
+      "novel": 1409,
+      "novelLiftPct": 100,
+      "overtureCompleteness": {
+        "phone": 1221,
+        "website": 825,
+        "phonePct": 87,
+        "websitePct": 59
+      },
+      "novelCompleteness": {
+        "phone": 1221,
+        "website": 825,
+        "phonePct": 87,
+        "websitePct": 59
+      },
+      "bundleCompleteness": {
+        "phone": 0,
+        "website": 0,
+        "phonePct": 0,
+        "websitePct": 0
+      },
+      "sampleNovel": [
+        {
+          "name": "Fabio Trabocchi Restaurants in Italia",
+          "category": "restaurant",
+          "phone": null,
+          "website": "http://fabiotrabocchi.com/"
+        },
+        {
+          "name": "Sagra Rooftop Restaurant and Bar",
+          "category": "restaurant",
+          "phone": "+390418521300",
+          "website": "http://www.marriott.com/hotels/fact-sheet/travel/vcejw-jw-marriott-venice-resort-and-spa/"
+        },
+        {
+          "name": "Le Specialità",
+          "category": "restaurant",
+          "phone": "+390414750111",
+          "website": "https://www.sanclementepalace.it/dining/le-specialita?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZnRzaAQuVMtleHRuA2FlbQIxMQBzcnRjBmFwcF9pZA8xMjQwMjQ1NzQyODc0MTQAAacOiP5enV6wA7QT7cBEB-zyx0u5gOw5ltfRQvo1_YSafnyy8P67keBQA8ae0g_aem_gs4KLz6jSBh-ifVYuSiuVw"
+        },
+        {
+          "name": "La Dolce Brasserie",
+          "category": "restaurant",
+          "phone": "0414750111",
+          "website": "https://www.kempinski.com/en/san-clemente-palace-kempinski/restaurants-bars/la-dolce-brasserie-pool-bar"
+        },
+        {
+          "name": "Robe da Matti Restaurant",
+          "category": "restaurant",
+          "phone": "+393314427648",
+          "website": "https://www.artandfoodgroup.it/robedamatti"
+        },
+        {
+          "name": "Nene Restaurant",
+          "category": "restaurant",
+          "phone": "+390410980226",
+          "website": null
+        },
+        {
+          "name": "Gelido Lato",
+          "category": "casual_eatery",
+          "phone": "394 1839 0645",
+          "website": "http://www.gelidolato.it"
+        },
+        {
+          "name": "Dolce Vita",
+          "category": "restaurant",
+          "phone": "+390417799010",
+          "website": null
+        }
+      ]
     }
   ],
   "totals": {
-    "overture": 6783,
-    "matched": 720,
-    "novel": 6063,
-    "avgNovelLiftPct": 787
+    "overture": 9861,
+    "matched": 749,
+    "novel": 9112,
+    "avgNovelLiftPct": 1225
   }
 }

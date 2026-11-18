@@ -45,7 +45,7 @@ export default defineConfig({
       workbox: {
         navigateFallback: '/index.html',
         // Venue bundles (OSM + Overture) push the main chunk above the 2 MiB default.
-        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
+        maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
         runtimeCaching: [
           {

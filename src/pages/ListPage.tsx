@@ -360,10 +360,15 @@ export function ListPage() {
         )}
 
         {loading && venues.length === 0 ? (
-          <div className="grid gap-0 bg-card rounded-xl border border-line px-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <VenueCardSkeleton key={i} />
-            ))}
+          <div className="space-y-3">
+            <div className="bg-elev rounded-xl border border-line px-4 py-3 text-sm text-muted">
+              Zona senza dati offline: sto interrogando OpenStreetMap…
+            </div>
+            <div className="grid gap-0 bg-card rounded-xl border border-line px-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <VenueCardSkeleton key={i} />
+              ))}
+            </div>
           </div>
         ) : displayedVenues.length === 0 && !loading ? (
           <EmptyState
@@ -377,7 +382,9 @@ export function ListPage() {
             description={
               isSearching
                 ? 'Prova con un altro termine'
-                : 'Aumenta il raggio o togli un filtro'
+                : error
+                  ? 'Riprova: OpenStreetMap può essere lento fuori dalle zone con dati offline.'
+                  : 'Aumenta il raggio o togli un filtro'
             }
             illustration={isSearching ? 'search' : 'map'}
           />

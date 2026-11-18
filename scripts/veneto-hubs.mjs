@@ -21,4 +21,7 @@ export const VENETO_HUBS = [
   { name: 'Schio', lat: 45.712, lon: 11.358 },
   { name: 'Thiene', lat: 45.708, lon: 11.48 },
   { name: 'Marostica', lat: 45.746, lon: 11.655 },
+  // Also offered as quick cities — need offline coverage or Overpass is the only path
+  { name: 'Verona', lat: 45.4384, lon: 10.9916 },
+  { name: 'Venezia', lat: 45.4408, lon: 12.3155 },
 ];

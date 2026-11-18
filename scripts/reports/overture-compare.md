@@ -1,6 +1,6 @@
 # Overture Places pilot — vs regional bundle
 
-Generated: 2026-11-17T16:03:40.988Z
+Generated: 2026-11-18T11:33:43.567Z
 Release: 2026-10-21.0
 Radius: 5 km · Match: ≤80 m + similar name
 
@@ -106,11 +106,11 @@ Completeness bundle: phone 21% · website 12%
 
 | Metric | Count |
 | --- | ---: |
-| Bundle OSM ≤5 km | 0 |
+| Bundle OSM ≤5 km | 1 |
 | Overture food/drink ≤5 km | 128 |
 | Matched (dup) | 0 |
 | **New from Overture** | **128** |
-| Novel lift vs bundle | 100% |
+| Novel lift vs bundle | 12800% |
 
 Completeness Overture: phone 96% · website 48%
 Completeness novel only: phone 96% · website 48%
@@ -120,29 +120,29 @@ Completeness bundle: phone 0% · website 0%
 
 | Metric | Count |
 | --- | ---: |
-| Bundle OSM ≤5 km | 0 |
+| Bundle OSM ≤5 km | 18 |
 | Overture food/drink ≤5 km | 369 |
-| Matched (dup) | 0 |
-| **New from Overture** | **369** |
-| Novel lift vs bundle | 100% |
+| Matched (dup) | 7 |
+| **New from Overture** | **362** |
+| Novel lift vs bundle | 2011% |
 
 Completeness Overture: phone 93% · website 68%
 Completeness novel only: phone 93% · website 68%
-Completeness bundle: phone 0% · website 0%
+Completeness bundle: phone 22% · website 17%
 
 ## Asolo
 
 | Metric | Count |
 | --- | ---: |
-| Bundle OSM ≤5 km | 0 |
+| Bundle OSM ≤5 km | 20 |
 | Overture food/drink ≤5 km | 165 |
-| Matched (dup) | 0 |
-| **New from Overture** | **165** |
-| Novel lift vs bundle | 100% |
+| Matched (dup) | 9 |
+| **New from Overture** | **156** |
+| Novel lift vs bundle | 780% |
 
 Completeness Overture: phone 95% · website 55%
-Completeness novel only: phone 95% · website 55%
-Completeness bundle: phone 0% · website 0%
+Completeness novel only: phone 94% · website 54%
+Completeness bundle: phone 10% · website 5%
 
 ## Vicenza
 
@@ -204,19 +204,47 @@ Completeness bundle: phone 45% · website 24%
 
 | Metric | Count |
 | --- | ---: |
-| Bundle OSM ≤5 km | 3 |
+| Bundle OSM ≤5 km | 43 |
 | Overture food/drink ≤5 km | 208 |
-| Matched (dup) | 0 |
-| **New from Overture** | **208** |
-| Novel lift vs bundle | 6933% |
+| Matched (dup) | 13 |
+| **New from Overture** | **195** |
+| Novel lift vs bundle | 453% |
 
 Completeness Overture: phone 95% · website 47%
-Completeness novel only: phone 95% · website 47%
+Completeness novel only: phone 95% · website 46%
+Completeness bundle: phone 12% · website 7%
+
+## Verona
+
+| Metric | Count |
+| --- | ---: |
+| Bundle OSM ≤5 km | 0 |
+| Overture food/drink ≤5 km | 1669 |
+| Matched (dup) | 0 |
+| **New from Overture** | **1669** |
+| Novel lift vs bundle | 100% |
+
+Completeness Overture: phone 88% · website 53%
+Completeness novel only: phone 88% · website 53%
+Completeness bundle: phone 0% · website 0%
+
+## Venezia
+
+| Metric | Count |
+| --- | ---: |
+| Bundle OSM ≤5 km | 0 |
+| Overture food/drink ≤5 km | 1409 |
+| Matched (dup) | 0 |
+| **New from Overture** | **1409** |
+| Novel lift vs bundle | 100% |
+
+Completeness Overture: phone 87% · website 59%
+Completeness novel only: phone 87% · website 59%
 Completeness bundle: phone 0% · website 0%
 
 ## Totals
 
-- Overture food/drink: 6783
-- Matched: 720
-- Novel: 6063
-- Avg novel lift: 787%
+- Overture food/drink: 9861
+- Matched: 749
+- Novel: 9112
+- Avg novel lift: 1225%
