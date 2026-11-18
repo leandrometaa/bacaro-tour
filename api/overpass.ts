@@ -22,9 +22,9 @@ const FALLBACK_MIRRORS = [
 ];
 
 /** Parallel race budget (wall clock). */
-const RACE_TIMEOUT_MS = 16_000;
-/** Per-mirror budget for sequential fallback. Worst case: 16 + 3×13 = 55s < 60. */
-const FALLBACK_TIMEOUT_MS = 13_000;
+const RACE_TIMEOUT_MS = 35_000;
+/** Per-mirror budget for sequential fallback. Worst case: 35 + 3×8 = 59s < 60. */
+const FALLBACK_TIMEOUT_MS = 8_000;
 
 const USER_AGENT =
   'BacaroTour/1.0 (+https://bacaro-tour-iota.vercel.app; OSM data consumer)';

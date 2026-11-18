@@ -4,21 +4,26 @@ import { buildWeeklyHours } from '../utils/openingHours';
 import { venueTypeLabel } from '../utils/typeLabels';
 import { normalizeWebsiteUrl } from '../utils/url';
 
-/** Prefer our Vercel proxy; fall back to public mirrors from the browser. */
-const OVERPASS_ENDPOINTS = [
-  '/api/overpass',
+/** Prefer our Vercel proxy; on failure race public mirrors from the browser. */
+const PROXY_ENDPOINT = '/api/overpass';
+
+const BROWSER_MIRRORS = [
+  'https://overpass.private.coffee/api/interpreter',
+  'https://overpass.kumi.systems/api/interpreter',
+  'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
   'https://overpass-api.de/api/interpreter',
-  'https://overpass.openstreetmap.fr/api/interpreter',
 ];
 
 const MAX_RESULTS = 150;
 /** Soft cap after merge so maps stay usable in dense cities. */
 export const VENUE_DISPLAY_CAP = 200;
 /**
- * Per-endpoint budget. UI already paints the offline peek, so we can wait
- * longer for a real Overpass response instead of always falling back.
+ * Proxy attempt budget. Aligns with the serverless race + fallback window
+ * (maxDuration 60) so a slow-but-winning mirror can still return.
  */
-const CLIENT_TIMEOUT_MS = 22_000;
+const PROXY_TIMEOUT_MS = 55_000;
+/** Parallel browser race against public Overpass mirrors. */
+const BROWSER_RACE_TIMEOUT_MS = 30_000;
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const CACHE_PREFIX = 'bacaro_tour_osm_';
 const CACHE_VERSION = 2;
@@ -219,8 +224,23 @@ type OverpassFetchOk = {
   partial: boolean;
 };
 
-async function fetchOneOverpass(
-  endpoint: string,
+function parseOverpassPayload(data: OverpassResponse & { error?: string }): OverpassFetchOk {
+  if (data.error && !data.elements) {
+    throw new Error(data.error);
+  }
+  const elements = data.elements ?? [];
+  const remark = data.remark;
+  if (elements.length === 0 && isBadRemark(remark)) {
+    throw new Error('Timeout Overpass: riprova o riduci il raggio');
+  }
+  return {
+    elements,
+    remark,
+    partial: isBadRemark(remark) && elements.length > 0,
+  };
+}
+
+async function fetchViaProxy(
   query: string,
   signal?: AbortSignal
 ): Promise<OverpassFetchOk> {
@@ -229,23 +249,17 @@ async function fetchOneOverpass(
   signal?.addEventListener('abort', onAbort, { once: true });
   const timeoutId = window.setTimeout(
     () => timeoutController.abort(),
-    CLIENT_TIMEOUT_MS
+    PROXY_TIMEOUT_MS
   );
 
-  const viaProxy = endpoint.startsWith('/');
-
   try {
-    const response = await fetch(endpoint, {
+    const response = await fetch(PROXY_ENDPOINT, {
       method: 'POST',
-      headers: viaProxy
-        ? { 'Content-Type': 'application/json', Accept: 'application/json' }
-        : {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            Accept: 'application/json',
-          },
-      body: viaProxy
-        ? JSON.stringify({ query })
-        : `data=${encodeURIComponent(query)}`,
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({ query }),
       signal: timeoutController.signal,
     });
 
@@ -256,19 +270,7 @@ async function fetchOneOverpass(
     const data = (await response.json()) as OverpassResponse & {
       error?: string;
     };
-    if (data.error && !data.elements) {
-      throw new Error(data.error);
-    }
-    const elements = data.elements ?? [];
-    const remark = data.remark;
-    if (elements.length === 0 && isBadRemark(remark)) {
-      throw new Error('Timeout Overpass: riprova o riduci il raggio');
-    }
-    return {
-      elements,
-      remark,
-      partial: isBadRemark(remark) && elements.length > 0,
-    };
+    return parseOverpassPayload(data);
   } catch (err) {
     if (err instanceof DOMException && err.name === 'AbortError') {
       if (signal?.aborted) throw err;
@@ -281,6 +283,70 @@ async function fetchOneOverpass(
   }
 }
 
+/**
+ * CORS simple request to a public Overpass mirror (no custom headers).
+ */
+async function fetchBrowserMirror(
+  endpoint: string,
+  query: string,
+  signal: AbortSignal
+): Promise<OverpassFetchOk> {
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: `data=${encodeURIComponent(query)}`,
+    signal,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Overpass HTTP ${response.status}`);
+  }
+
+  const data = (await response.json()) as OverpassResponse & {
+    error?: string;
+  };
+  return parseOverpassPayload(data);
+}
+
+/**
+ * Parallel race (Promise.any) across browser mirrors; abort losers on first win.
+ */
+async function raceBrowserMirrors(
+  query: string,
+  signal?: AbortSignal
+): Promise<OverpassFetchOk> {
+  const shared = new AbortController();
+  const timeoutId = window.setTimeout(
+    () => shared.abort(),
+    BROWSER_RACE_TIMEOUT_MS
+  );
+  const onParentAbort = () => shared.abort();
+  signal?.addEventListener('abort', onParentAbort, { once: true });
+
+  try {
+    const attempts = BROWSER_MIRRORS.map(async (endpoint) => {
+      const result = await fetchBrowserMirror(endpoint, query, shared.signal);
+      // First success wins — cancel the remaining mirrors.
+      shared.abort();
+      return result;
+    });
+    return await Promise.any(attempts);
+  } catch (err) {
+    if (signal?.aborted) {
+      throw new DOMException('Aborted', 'AbortError');
+    }
+    if (err instanceof DOMException && err.name === 'AbortError') {
+      throw new Error('Timeout Overpass: riprova o riduci il raggio');
+    }
+    throw new Error('Overpass non raggiungibile');
+  } finally {
+    window.clearTimeout(timeoutId);
+    signal?.removeEventListener('abort', onParentAbort);
+  }
+}
+
 async function fetchOverpass(
   query: string,
   signal?: AbortSignal
@@ -289,59 +355,16 @@ async function fetchOverpass(
     throw new DOMException('Aborted', 'AbortError');
   }
 
-  const [proxy, ...mirrors] = OVERPASS_ENDPOINTS;
-
-  // Prefer Vercel proxy (more reliable than browser→Overpass).
+  // Prefer Vercel proxy; on non-2xx / network / timeout, race mirrors in-browser.
   try {
-    return await fetchOneOverpass(proxy, query, signal);
+    return await fetchViaProxy(query, signal);
   } catch (err) {
     if (err instanceof DOMException && err.name === 'AbortError' && signal?.aborted) {
       throw err;
     }
   }
 
-  const errors: Error[] = [];
-  const shared = new AbortController();
-  const onParentAbort = () => shared.abort();
-  signal?.addEventListener('abort', onParentAbort, { once: true });
-
-  try {
-    const result = await new Promise<OverpassFetchOk>((resolve, reject) => {
-      let pending = mirrors.length;
-      if (pending === 0) {
-        reject(new Error('Overpass non raggiungibile'));
-        return;
-      }
-      for (const endpoint of mirrors) {
-        void fetchOneOverpass(endpoint, query, shared.signal).then(
-          (ok) => {
-            shared.abort();
-            resolve(ok);
-          },
-          (err) => {
-            if (err instanceof Error) errors.push(err);
-            pending -= 1;
-            if (pending === 0) {
-              reject(
-                errors[0] ?? new Error('Overpass non raggiungibile')
-              );
-            }
-          }
-        );
-      }
-    });
-    return result;
-  } catch (err) {
-    if (signal?.aborted) {
-      throw new DOMException('Aborted', 'AbortError');
-    }
-    if (err instanceof DOMException && err.name === 'AbortError') {
-      throw err;
-    }
-    throw err instanceof Error ? err : new Error('Overpass non raggiungibile');
-  } finally {
-    signal?.removeEventListener('abort', onParentAbort);
-  }
+  return raceBrowserMirrors(query, signal);
 }
 
 function mapAmenityToType(
