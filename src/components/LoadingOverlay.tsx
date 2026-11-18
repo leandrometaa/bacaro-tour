@@ -19,7 +19,7 @@ export function LoadingOverlay({
         {loading && (
           <div className="flex items-center gap-3 text-muted">
             <Loader2 size={20} className="animate-spin text-primary" />
-            <span className="text-sm">Caricamento locali da OpenStreetMap…</span>
+            <span className="text-sm">Aggiorno i locali da OpenStreetMap…</span>
           </div>
         )}
         {error && !loading && (

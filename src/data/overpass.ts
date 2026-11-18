@@ -5,13 +5,16 @@ import { venueTypeLabel } from '../utils/typeLabels';
 import { normalizeWebsiteUrl } from '../utils/url';
 
 const OVERPASS_ENDPOINTS = [
-  'https://overpass.openstreetmap.fr/api/interpreter',
   'https://overpass-api.de/api/interpreter',
+  'https://overpass.openstreetmap.fr/api/interpreter',
 ];
 
 const MAX_RESULTS = 150;
-/** Per-endpoint budget: fail fast so UI can refresh after the regional peek. */
-const CLIENT_TIMEOUT_MS = 6_000;
+/**
+ * Per-endpoint budget. UI already paints the offline peek, so we can wait
+ * longer for a real Overpass response instead of always falling back.
+ */
+const CLIENT_TIMEOUT_MS = 20_000;
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const CACHE_PREFIX = 'bacaro_tour_osm_';
 const CACHE_VERSION = 2;
@@ -206,69 +209,102 @@ function isBadRemark(remark: string | undefined): boolean {
   return Boolean(remark && /timeout|error|runtime/i.test(remark));
 }
 
+type OverpassFetchOk = {
+  elements: OsmElement[];
+  remark?: string;
+  partial: boolean;
+};
+
+async function fetchOneOverpass(
+  endpoint: string,
+  query: string,
+  signal?: AbortSignal
+): Promise<OverpassFetchOk> {
+  const timeoutController = new AbortController();
+  const onAbort = () => timeoutController.abort();
+  signal?.addEventListener('abort', onAbort, { once: true });
+  const timeoutId = window.setTimeout(
+    () => timeoutController.abort(),
+    CLIENT_TIMEOUT_MS
+  );
+
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Accept: 'application/json',
+      },
+      body: `data=${encodeURIComponent(query)}`,
+      signal: timeoutController.signal,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Overpass HTTP ${response.status}`);
+    }
+
+    const data = (await response.json()) as OverpassResponse;
+    const elements = data.elements ?? [];
+    const remark = data.remark;
+    if (elements.length === 0 && isBadRemark(remark)) {
+      throw new Error('Timeout Overpass: riprova o riduci il raggio');
+    }
+    return {
+      elements,
+      remark,
+      partial: isBadRemark(remark) && elements.length > 0,
+    };
+  } catch (err) {
+    if (err instanceof DOMException && err.name === 'AbortError') {
+      if (signal?.aborted) throw err;
+      throw new Error('Timeout Overpass: riprova o riduci il raggio');
+    }
+    throw err instanceof Error ? err : new Error(String(err));
+  } finally {
+    window.clearTimeout(timeoutId);
+    signal?.removeEventListener('abort', onAbort);
+  }
+}
+
+/** Race mirrors in parallel — first usable response wins. */
 async function fetchOverpass(
   query: string,
   signal?: AbortSignal
-): Promise<{ elements: OsmElement[]; remark?: string; partial: boolean }> {
-  let lastError: Error | null = null;
+): Promise<OverpassFetchOk> {
+  if (signal?.aborted) {
+    throw new DOMException('Aborted', 'AbortError');
+  }
 
-  for (const endpoint of OVERPASS_ENDPOINTS) {
+  const errors: Error[] = [];
+  const shared = new AbortController();
+  const onParentAbort = () => shared.abort();
+  signal?.addEventListener('abort', onParentAbort, { once: true });
+
+  try {
+    const result = await Promise.any(
+      OVERPASS_ENDPOINTS.map((endpoint) =>
+        fetchOneOverpass(endpoint, query, shared.signal).catch((err) => {
+          if (err instanceof Error) errors.push(err);
+          throw err;
+        })
+      )
+    );
+    shared.abort();
+    return result;
+  } catch (err) {
     if (signal?.aborted) {
       throw new DOMException('Aborted', 'AbortError');
     }
-
-    const timeoutController = new AbortController();
-    const onAbort = () => timeoutController.abort();
-    signal?.addEventListener('abort', onAbort, { once: true });
-    const timeoutId = window.setTimeout(
-      () => timeoutController.abort(),
-      CLIENT_TIMEOUT_MS
-    );
-
-    try {
-      // Browser sets User-Agent; custom Referer/UA headers are ignored by fetch.
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          Accept: 'application/json',
-        },
-        body: `data=${encodeURIComponent(query)}`,
-        signal: timeoutController.signal,
-      });
-
-      if (!response.ok) {
-        lastError = new Error(`Overpass HTTP ${response.status}`);
-        continue;
-      }
-
-      const data = (await response.json()) as OverpassResponse;
-      const elements = data.elements ?? [];
-      const remark = data.remark;
-      // Timeout/remark with empty elements is not a successful empty area.
-      if (elements.length === 0 && isBadRemark(remark)) {
-        lastError = new Error('Timeout Overpass: riprova o riduci il raggio');
-        continue;
-      }
-      return {
-        elements,
-        remark,
-        partial: isBadRemark(remark) && elements.length > 0,
-      };
-    } catch (err) {
-      if (err instanceof DOMException && err.name === 'AbortError') {
-        if (signal?.aborted) throw err;
-        lastError = new Error('Timeout Overpass: riprova o riduci il raggio');
-        continue;
-      }
-      lastError = err instanceof Error ? err : new Error(String(err));
-    } finally {
-      window.clearTimeout(timeoutId);
-      signal?.removeEventListener('abort', onAbort);
+    if (err instanceof DOMException && err.name === 'AbortError') {
+      throw err;
     }
+    throw (
+      errors[0] ??
+      (err instanceof Error ? err : new Error('Overpass non raggiungibile'))
+    );
+  } finally {
+    signal?.removeEventListener('abort', onParentAbort);
   }
-
-  throw lastError ?? new Error('Overpass non raggiungibile');
 }
 
 function mapAmenityToType(

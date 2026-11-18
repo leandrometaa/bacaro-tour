@@ -304,9 +304,15 @@ export function ListPage() {
           onRetry={retry}
         />
 
+        {loading && venues.length > 0 && (
+          <div className="mb-3 bg-elev rounded-xl px-4 py-2 border border-line text-sm text-muted">
+            Aggiorno da OpenStreetMap…
+          </div>
+        )}
         {stale && !loading && (
           <div className="mb-3 bg-accent-soft rounded-xl px-4 py-2 border border-line text-sm text-accent-text">
-            Dati locali offline — possono non essere aggiornati.
+            OpenStreetMap non ha risposto: mostro i dati salvati nell&apos;app
+            (possono non essere aggiornati).
           </div>
         )}
 

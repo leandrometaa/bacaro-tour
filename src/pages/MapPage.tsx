@@ -374,9 +374,12 @@ export function MapPage() {
                 </button>
               )}
             </div>
+            {loading && venues.length > 0 && (
+              <p className="text-xs text-muted">Aggiorno da OpenStreetMap…</p>
+            )}
             {stale && !loading && (
               <p className="text-xs text-accent-text">
-                Dati locali offline — possono non essere aggiornati.
+                OSM non risponde — dati salvati nell&apos;app.
               </p>
             )}
             {truncated && !loading && !stale && (
