@@ -5,13 +5,27 @@
  * Overpass returns HTTP 406 for missing/default library User-Agents
  * (Node fetch, axios, etc.). Identify the app explicitly.
  */
-const MIRRORS = [
-  'https://overpass-api.de/api/interpreter',
-  'https://overpass.openstreetmap.fr/api/interpreter',
+
+/** Vercel Node serverless: allow enough time for race + sequential fallback. */
+export const config = { maxDuration: 60 };
+
+const FAST_MIRRORS = [
+  'https://overpass.private.coffee/api/interpreter',
   'https://overpass.kumi.systems/api/interpreter',
+  'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
 ];
 
-const TIMEOUT_MS = 22_000;
+const FALLBACK_MIRRORS = [
+  'https://lz4.overpass-api.de/api/interpreter',
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.openstreetmap.fr/api/interpreter',
+];
+
+/** Parallel race budget (wall clock). */
+const RACE_TIMEOUT_MS = 16_000;
+/** Per-mirror budget for sequential fallback. Worst case: 16 + 3×13 = 55s < 60. */
+const FALLBACK_TIMEOUT_MS = 13_000;
+
 const USER_AGENT =
   'BacaroTour/1.0 (+https://bacaro-tour-iota.vercel.app; OSM data consumer)';
 
@@ -26,6 +40,10 @@ type VercelResponse = {
   json: (body: unknown) => void;
   send: (body: string) => void;
 };
+
+type MirrorOk = { ok: true; json: unknown };
+type MirrorFail = { ok: false; error: string };
+type MirrorResult = MirrorOk | MirrorFail;
 
 function readQuery(body: unknown): string | null {
   if (!body) return null;
@@ -49,10 +67,22 @@ function readQuery(body: unknown): string | null {
 
 async function fetchMirror(
   endpoint: string,
-  query: string
-): Promise<{ ok: true; json: unknown } | { ok: false; error: string }> {
+  query: string,
+  timeoutMs: number,
+  externalSignal?: AbortSignal
+): Promise<MirrorResult> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  const onExternalAbort = () => controller.abort();
+  if (externalSignal) {
+    if (externalSignal.aborted) {
+      clearTimeout(timer);
+      return { ok: false, error: 'Aborted' };
+    }
+    externalSignal.addEventListener('abort', onExternalAbort, { once: true });
+  }
+
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
@@ -74,6 +104,47 @@ async function fetchMirror(
     return { ok: false, error: message };
   } finally {
     clearTimeout(timer);
+    if (externalSignal) {
+      externalSignal.removeEventListener('abort', onExternalAbort);
+    }
+  }
+}
+
+/**
+ * Race mirrors in parallel; first successful JSON wins and aborts the rest.
+ */
+async function raceMirrors(
+  endpoints: string[],
+  query: string
+): Promise<{ ok: true; json: unknown } | { ok: false; errors: string[] }> {
+  const controllers = endpoints.map(() => new AbortController());
+  const errors: string[] = new Array(endpoints.length);
+
+  const attempts = endpoints.map(async (endpoint, index) => {
+    const result = await fetchMirror(
+      endpoint,
+      query,
+      RACE_TIMEOUT_MS,
+      controllers[index].signal
+    );
+    if (!result.ok) {
+      errors[index] = `${endpoint}: ${result.error}`;
+      throw new Error(result.error);
+    }
+    for (let i = 0; i < controllers.length; i++) {
+      if (i !== index) controllers[i].abort();
+    }
+    return result.json;
+  });
+
+  try {
+    const json = await Promise.any(attempts);
+    return { ok: true, json };
+  } catch {
+    return {
+      ok: false,
+      errors: errors.filter((e): e is string => typeof e === 'string'),
+    };
   }
 }
 
@@ -97,8 +168,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const errors: string[] = [];
-  for (const mirror of MIRRORS) {
-    const result = await fetchMirror(mirror, query);
+
+  const raced = await raceMirrors(FAST_MIRRORS, query);
+  if (raced.ok) {
+    res.status(200).json(raced.json);
+    return;
+  }
+  errors.push(...raced.errors);
+
+  for (const mirror of FALLBACK_MIRRORS) {
+    const result = await fetchMirror(mirror, query, FALLBACK_TIMEOUT_MS);
     if (result.ok) {
       res.status(200).json(result.json);
       return;
