@@ -1,26 +1,27 @@
+/// <reference types="vitest/config" />
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  base: '/bacaro-tour/',
+  base: '/',
   plugins: [
     react(),
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
+      includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'pwa-maskable.svg'],
       manifest: {
         name: 'Bacaro Tour',
         short_name: 'Bacaro Tour',
         description: 'Trova dove mangiare e bere vicino a te',
-        theme_color: '#69a6ab',
-        background_color: '#f0f7f8',
+        theme_color: '#6b2d3c',
+        background_color: '#faf6f1',
         display: 'standalone',
         orientation: 'portrait',
-        start_url: '/bacaro-tour/',
-        scope: '/bacaro-tour/',
+        start_url: '/',
+        scope: '/',
         lang: 'it',
         icons: [
           {
@@ -34,7 +35,7 @@ export default defineConfig({
             type: 'image/png',
           },
           {
-            src: 'pwa-512.png',
+            src: 'pwa-maskable.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',
@@ -42,7 +43,9 @@ export default defineConfig({
         ],
       },
       workbox: {
-        navigateFallback: '/bacaro-tour/index.html',
+        navigateFallback: '/index.html',
+        // Venue bundles (OSM + Overture) push the main chunk above the 2 MiB default.
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
         runtimeCaching: [
           {
@@ -51,14 +54,34 @@ export default defineConfig({
             options: {
               cacheName: 'osm-tiles',
               expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 7 },
+              cacheableResponse: { statuses: [0, 200] },
             },
           },
         ],
       },
     }),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          leaflet: [
+            'leaflet',
+            'react-leaflet',
+            'react-leaflet-cluster',
+            'leaflet.markercluster',
+          ],
+          openingHours: ['opening_hours'],
+        },
+      },
+    },
+  },
   server: {
     port: 5199,
     host: '0.0.0.0',
+  },
+  test: {
+    environment: 'node',
+    include: ['src/**/*.test.ts'],
   },
 })

@@ -1,5 +1,12 @@
 import opening_hours from 'opening_hours';
-import type { DayHours, DayOfWeek, Venue, WeeklyHours } from '../types';
+import type {
+  DayHours,
+  DayOfWeek,
+  OpeningState,
+  TimeInterval,
+  Venue,
+  WeeklyHours,
+} from '../types';
 
 const DAY_NAMES: DayOfWeek[] = [
   'domenica',
@@ -20,6 +27,8 @@ const DAY_LABELS: Record<DayOfWeek, string> = {
   sabato: 'Sabato',
   domenica: 'Domenica',
 };
+
+const ohCache = new Map<string, opening_hours | null>();
 
 export function getCurrentDay(): DayOfWeek {
   return DAY_NAMES[new Date().getDay()];
@@ -61,9 +70,14 @@ export function parseOpeningHoursString(
   raw: string | null | undefined
 ): opening_hours | null {
   if (!raw?.trim()) return null;
+  const key = raw.trim();
+  if (ohCache.has(key)) return ohCache.get(key) ?? null;
   try {
-    return new opening_hours(raw);
+    const oh = new opening_hours(key);
+    ohCache.set(key, oh);
+    return oh;
   } catch {
+    ohCache.set(key, null);
     return null;
   }
 }
@@ -81,7 +95,6 @@ export function buildWeeklyHours(
 
   for (let i = 0; i < 7; i++) {
     const day = DAY_NAMES[i];
-    // Build a date for the next occurrence of this weekday
     const dayOffset = (i - now.getDay() + 7) % 7;
     const dayStart = new Date(now);
     dayStart.setDate(now.getDate() + dayOffset);
@@ -89,16 +102,16 @@ export function buildWeeklyHours(
     const dayEnd = new Date(dayStart);
     dayEnd.setHours(23, 59, 59, 999);
 
-    const intervals = oh.getOpenIntervals(dayStart, dayEnd);
-    if (!intervals.length) {
+    const rawIntervals = oh.getOpenIntervals(dayStart, dayEnd);
+    if (!rawIntervals.length) {
       result[day] = null;
       continue;
     }
 
-    const first = intervals[0];
-    const last = intervals[intervals.length - 1];
-    const open = formatHm(first[0]);
-    const close = formatHm(last[1]);
+    const intervals: TimeInterval[] = rawIntervals.map(([start, end]) => ({
+      open: formatHm(start),
+      close: formatHm(end),
+    }));
 
     let kitchenClose: string | undefined;
     if (kitchenOh) {
@@ -108,10 +121,30 @@ export function buildWeeklyHours(
       }
     }
 
-    result[day] = { open, close, kitchenClose };
+    result[day] = {
+      intervals,
+      open: intervals[0].open,
+      close: intervals[intervals.length - 1].close,
+      kitchenClose,
+    };
   }
 
   return result;
+}
+
+export function formatDayHours(hours: DayHours): string {
+  return hours.intervals.map((i) => `${i.open} – ${i.close}`).join(', ');
+}
+
+export function getOpeningState(venue: Venue, at = new Date()): OpeningState {
+  if (!venue.hasHours || !venue.openingHoursRaw) return 'unknown';
+  const oh = parseOpeningHoursString(venue.openingHoursRaw);
+  if (!oh) return 'unknown';
+  try {
+    return oh.getState(at) ? 'open' : 'closed';
+  } catch {
+    return 'unknown';
+  }
 }
 
 export function isVenueOpenNow(venue: Venue, at = new Date()): boolean {
@@ -159,6 +192,20 @@ export function getClosingInfo(
   }
 }
 
+function isSameCalendarDay(a: Date, b: Date): boolean {
+  return (
+    a.getDate() === b.getDate() &&
+    a.getMonth() === b.getMonth() &&
+    a.getFullYear() === b.getFullYear()
+  );
+}
+
+function isTomorrow(next: Date, from: Date): boolean {
+  const tomorrow = new Date(from);
+  tomorrow.setDate(from.getDate() + 1);
+  return isSameCalendarDay(next, tomorrow);
+}
+
 export function formatOpeningStatus(venue: Venue, at = new Date()): string {
   if (!venue.hasHours) return 'Orari non disponibili';
 
@@ -179,11 +226,10 @@ export function formatOpeningStatus(venue: Venue, at = new Date()): string {
 
     const next = oh.getNextChange(at);
     if (next) {
-      const sameDay =
-        next.getDate() === at.getDate() &&
-        next.getMonth() === at.getMonth() &&
-        next.getFullYear() === at.getFullYear();
-      if (sameDay) return `Apre alle ${formatHm(next)}`;
+      if (isSameCalendarDay(next, at)) return `Apre alle ${formatHm(next)}`;
+      if (isTomorrow(next, at)) return `Apre domani alle ${formatHm(next)}`;
+      const dayName = next.toLocaleDateString('it-IT', { weekday: 'long' });
+      return `Apre ${dayName} alle ${formatHm(next)}`;
     }
     return 'Chiuso';
   } catch {

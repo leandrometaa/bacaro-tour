@@ -1,0 +1,155 @@
+{
+  "generatedAt": "2026-11-17T15:41:08.311Z",
+  "radiusKm": 5,
+  "maxResults": 150,
+  "bundleTotal": 1733,
+  "hubs": [
+    {
+      "hub": "Padova",
+      "radiusKm": 5,
+      "maxResults": 150,
+      "regionalBundleInRadius": 498,
+      "liveOsm": {
+        "ok": true,
+        "endpoint": "https://overpass.openstreetmap.fr/api/interpreter",
+        "error": null,
+        "rawBeforeCap": 722,
+        "afterCap": 150,
+        "truncated": true,
+        "usedBundleProxy": false
+      },
+      "merge": {
+        "afterMerge": 528,
+        "addedFromBundle": 378,
+        "onlyInBundle": 378,
+        "onlyInLive": 30
+      },
+      "ui": {
+        "defaultFiltersVisible": 528,
+        "openNowEligibleWithHours": 194,
+        "openNowExcludedMissingHours": 334,
+        "note": "Default UI filters keep all merged venues; openNow drops those without opening_hours."
+      },
+      "completeness": {
+        "bundle": {
+          "phone": 174,
+          "website": 114,
+          "photo": 1,
+          "hours": 180,
+          "phonePct": 35,
+          "websitePct": 23,
+          "photoPct": 0,
+          "hoursPct": 36
+        },
+        "merged": {
+          "phone": 184,
+          "website": 123,
+          "photo": 1,
+          "hours": 194,
+          "phonePct": 35,
+          "websitePct": 23,
+          "photoPct": 0,
+          "hoursPct": 37
+        }
+      }
+    },
+    {
+      "hub": "Vicenza",
+      "radiusKm": 5,
+      "maxResults": 150,
+      "regionalBundleInRadius": 343,
+      "liveOsm": {
+        "ok": true,
+        "endpoint": "https://overpass.openstreetmap.fr/api/interpreter",
+        "error": null,
+        "rawBeforeCap": 494,
+        "afterCap": 150,
+        "truncated": true,
+        "usedBundleProxy": false
+      },
+      "merge": {
+        "afterMerge": 371,
+        "addedFromBundle": 221,
+        "onlyInBundle": 221,
+        "onlyInLive": 28
+      },
+      "ui": {
+        "defaultFiltersVisible": 371,
+        "openNowEligibleWithHours": 62,
+        "openNowExcludedMissingHours": 309,
+        "note": "Default UI filters keep all merged venues; openNow drops those without opening_hours."
+      },
+      "completeness": {
+        "bundle": {
+          "phone": 100,
+          "website": 77,
+          "photo": 0,
+          "hours": 57,
+          "phonePct": 29,
+          "websitePct": 22,
+          "photoPct": 0,
+          "hoursPct": 17
+        },
+        "merged": {
+          "phone": 108,
+          "website": 86,
+          "photo": 0,
+          "hours": 62,
+          "phonePct": 29,
+          "websitePct": 23,
+          "photoPct": 0,
+          "hoursPct": 17
+        }
+      }
+    },
+    {
+      "hub": "Bassano del Grappa",
+      "radiusKm": 5,
+      "maxResults": 150,
+      "regionalBundleInRadius": 191,
+      "liveOsm": {
+        "ok": true,
+        "endpoint": "https://overpass.openstreetmap.fr/api/interpreter",
+        "error": null,
+        "rawBeforeCap": 312,
+        "afterCap": 150,
+        "truncated": true,
+        "usedBundleProxy": false
+      },
+      "merge": {
+        "afterMerge": 232,
+        "addedFromBundle": 82,
+        "onlyInBundle": 82,
+        "onlyInLive": 41
+      },
+      "ui": {
+        "defaultFiltersVisible": 232,
+        "openNowEligibleWithHours": 33,
+        "openNowExcludedMissingHours": 199,
+        "note": "Default UI filters keep all merged venues; openNow drops those without opening_hours."
+      },
+      "completeness": {
+        "bundle": {
+          "phone": 36,
+          "website": 23,
+          "photo": 0,
+          "hours": 25,
+          "phonePct": 19,
+          "websitePct": 12,
+          "photoPct": 0,
+          "hoursPct": 13
+        },
+        "merged": {
+          "phone": 45,
+          "website": 29,
+          "photo": 0,
+          "hours": 33,
+          "phonePct": 19,
+          "websitePct": 13,
+          "photoPct": 0,
+          "hoursPct": 14
+        }
+      }
+    }
+  ]
+}

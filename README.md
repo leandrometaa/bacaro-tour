@@ -1,17 +1,15 @@
 # Bacaro Tour
 
-App mobile-first per trovare dove mangiare e bere vicino a te. Dati reali da OpenStreetMap.
+PWA mobile-first per trovare bacari, osterie e locali vicino a te (focus Veneto).  
+Dati da **OpenStreetMap** (live) + bundle regionali **OSM/Overture** (offline / enrichment).
 
 ## Funzionalità
 
-- **Geolocalizzazione** o ricerca città/indirizzo (Nominatim)
-- **Mappa** con raggio 1–30 km e pin dei locali
-- **Filtri**: Aperto adesso, Aperitivo, Vino e tagliere, Pizza, Cena
-- **Lista** e **dettaglio**: orari (oggi evidenziato), cucina se disponibile, indirizzo, tag OSM
-- **Liste salvate** e **diario visite** (localStorage)
-- **Segnala orario sbagliato**: apre una nota su OpenStreetMap
-- **PWA**: installabile sulla home screen
-- **Demo**: toggle offline con dati di esempio
+- Geolocalizzazione o città/indirizzo (Nominatim)
+- Mappa + lista tipografica, filtri mood/feature, “Aperti / orario n/d”
+- Dettaglio: orari, contatti, fonte dati, Giro, segnalazione OSM
+- Liste, diario visite (anche foto personali), share con snapshot
+- Fallback offline sui bundle; PWA installabile
 
 ## Come eseguire
 
@@ -20,42 +18,50 @@ npm install
 npm run dev
 ```
 
-Apri [http://localhost:5199/bacaro-tour/](http://localhost:5199/bacaro-tour/)  
-(`base` Vite è `/bacaro-tour/` per un eventuale hosting su GitHub Pages.)
-
-Build:
+Apri [http://localhost:5199/](http://localhost:5199/) (`base` Vite = `/`, pensato per **Vercel**).
 
 ```bash
 npm run build
 npm run preview
 ```
 
-## Click path
+## Deploy (Vercel)
 
-1. Apri l’app → scegli posizione (geolocalizzazione, ricerca, o zona rapida).
-2. Mappa con raggio e pin; regola lo slider.
-3. Attiva **Aperto adesso** e un mood (es. Pizza).
-4. Passa a **Lista** e apri un locale.
-5. Dettaglio: orari, mini-mappa, tag; cuore → salva in lista; **Ci sono stato** → visita.
-6. Tab **I miei posti**: liste e diario.
-7. Cerca un locale per nome.
-8. **Segnala orario sbagliato** apre OSM Note.
-9. Toggle **Demo** per dati offline di esempio.
+- Build: `npm run build` · Output: `dist`
+- `vercel.json` fa da SPA fallback su `index.html`
+- Quando il codice è pronto al deploy, usa Grokbot con il prompt Vercel (vedi chat / istruzioni agente)
 
-## Sorgente dati
+## Strategia dati (importante)
 
-- **Default**: Overpass API (`amenity=bar|pub|restaurant|cafe|fast_food|biergarten|ice_cream` e `cuisine=pizza`) con mirror di fallback.
-- Orari: libreria `opening_hours`. Se mancano → «Orari non disponibili»; il filtro Aperto adesso li esclude.
-- Foto: tag `image` / Wikimedia / Wikidata se presenti, altrimenti illustrazione di categoria.
-- Cache localStorage 24h, debounce, max ~80 risultati.
-- Credit: **Dati © OpenStreetMap contributors**
-- Modulo unico: `src/data/venues.ts` (+ `overpass.ts`, `demoVenues.ts`).
+Non “gonfiare” all’infinito il dataset prima del lancio. Tre livelli:
 
-## Cosa è stub / locale
+| Livello | Ruolo | Freschezza |
+|--------|--------|------------|
+| **Overpass (live)** | Locali nella zona scelta | Aggiornato a ogni ricerca |
+| **Bundle OSM regionale** | Copertura hub + offline | Rigenerato a mano / mensile |
+| **Bundle Overture** | Locali mancanti + contatti | Stesso ciclo del regionale |
+| **enrichment.json** | Note/foto/curatela tua | Quando vuoi (alto valore) |
 
-- Liste e visite solo in localStorage (niente account)
-- Toggle Demo = JSON offline di esempio
-- Nessun backend, prenotazioni o pagamenti
+Dopo la pubblicazione:
+
+1. L’app **non** dipende solo dal bundle: Overpass continua a portare posti nuovi dove c’è rete.
+2. I bundle servono a densità, offline e contatti: aggiornali **ogni 1–2 mesi**, non ogni giorno.
+3. Comandi:
+
+```bash
+npm run data:regional
+npm run data:overture:bundle
+npm run data:gate
+```
+
+4. Qualità > quantità: meglio hub giusti + `enrichment.json` sui bacari storici che 50k record rumorosi.
+5. Espandi hub Overture solo se in beta utenti dicono “qui non trovo niente”.
+
+## Crediti
+
+- © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright) (ODbL)
+- [Overture Maps Foundation](https://overturemaps.org/) — vedi [attribuzione](https://docs.overturemaps.org/attribution/)
+- Wikimedia / Wikipedia per alcune foto
 
 ## Stack
 

@@ -1,0 +1,32 @@
+{
+  "osm-node-4492301499": {
+    "nameHint": "Cantina Do Mori",
+    "tags": ["bacaro", "cicchetti", "ombra", "storico"],
+    "moods": ["aperitivo", "vino-tagliere"]
+  },
+  "osm-node-1400923319": {
+    "nameHint": "Cantinone già Schiavi",
+    "tags": ["bacaro", "cicchetti", "vino", "dehors"],
+    "moods": ["aperitivo", "vino-tagliere"]
+  },
+  "osm-node-1392056417": {
+    "nameHint": "All'Arco",
+    "tags": ["bacaro", "cicchetti", "ombra"],
+    "moods": ["aperitivo", "vino-tagliere"]
+  },
+  "osm-node-312152357": {
+    "nameHint": "Osteria ai 4 Feri",
+    "tags": ["osteria", "cicchetti", "pesce"],
+    "moods": ["cena", "vino-tagliere"]
+  },
+  "osm-node-597123999": {
+    "nameHint": "Al Bottegon",
+    "tags": ["bacaro", "cicchetti", "vino"],
+    "moods": ["aperitivo", "vino-tagliere"]
+  },
+  "osm-node-2159762587": {
+    "nameHint": "Bacaro Risorto",
+    "tags": ["bacaro", "cicchetti", "aperitivo"],
+    "moods": ["aperitivo"]
+  }
+}

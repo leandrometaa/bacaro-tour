@@ -1,8 +1,19 @@
-export interface DayHours {
+export interface TimeInterval {
   open: string;
+  close: string;
+}
+
+export interface DayHours {
+  /** All open intervals for the day (supports lunch + dinner splits) */
+  intervals: TimeInterval[];
+  /** First interval open — convenience for simple displays */
+  open: string;
+  /** Last interval close — convenience for simple displays */
   close: string;
   kitchenClose?: string;
 }
+
+export type OpeningState = 'open' | 'closed' | 'unknown';
 
 export interface WeeklyHours {
   lunedi: DayHours | null;
@@ -46,13 +57,14 @@ export interface Venue {
   hours: WeeklyHours | null;
   tags: string[];
   moods: Mood[];
-  priceRange: 1 | 2 | 3;
+  /** Present only when we have real price signals */
+  priceRange?: 1 | 2 | 3;
   photos: string[];
   phone?: string;
   website?: string;
   cuisine?: string[];
   hasHours: boolean;
-  source: 'osm' | 'demo';
+  source: 'osm' | 'overture';
 }
 
 export interface SavedList {
@@ -69,17 +81,20 @@ export interface Visit {
   rating: 1 | 2 | 3 | 4 | 5;
   tags: string[];
   note: string;
+  /** Optional personal photo as data URL (kept small). */
+  photoDataUrl?: string;
 }
 
 export interface UserData {
+  /** Schema version for localStorage migrations */
+  version: number;
   lists: SavedList[];
   visits: Visit[];
+  /** Snapshots of saved/visited venues so they survive city changes */
+  venuesById: Record<string, Venue>;
 }
 
-export interface DemoCity {
-  name: string;
-  coordinates: [number, number];
-}
+export const USER_DATA_VERSION = 3;
 
 export interface VenueQuery {
   center: [number, number];

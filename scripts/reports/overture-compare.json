@@ -1,0 +1,1154 @@
+{
+  "generatedAt": "2026-11-17T16:03:40.988Z",
+  "release": "2026-10-21.0",
+  "radiusKm": 5,
+  "matchMeters": 80,
+  "hubs": [
+    {
+      "hub": "Padova",
+      "bundleCount": 498,
+      "overtureCount": 1454,
+      "matched": 213,
+      "novel": 1241,
+      "novelLiftPct": 249,
+      "overtureCompleteness": {
+        "phone": 1315,
+        "website": 800,
+        "phonePct": 90,
+        "websitePct": 55
+      },
+      "novelCompleteness": {
+        "phone": 1110,
+        "website": 646,
+        "phonePct": 89,
+        "websitePct": 52
+      },
+      "bundleCompleteness": {
+        "phone": 174,
+        "website": 114,
+        "phonePct": 35,
+        "websitePct": 23
+      },
+      "sampleNovel": [
+        {
+          "name": "Villa Tevere",
+          "category": "restaurant",
+          "phone": "+393489232874",
+          "website": "https://villateverepadova.superbexperience.com/"
+        },
+        {
+          "name": "Villa Liviangior",
+          "category": "restaurant",
+          "phone": "+390498654519",
+          "website": "http://www.liviangior.it/villa/home.html"
+        },
+        {
+          "name": "Palazzo Gozzi",
+          "category": "cafe",
+          "phone": null,
+          "website": null
+        },
+        {
+          "name": "Grosso Pomodoro",
+          "category": "restaurant",
+          "phone": "+390498901193",
+          "website": "https://www.pizzeriagrossopomodoro.it/"
+        },
+        {
+          "name": "Pizzeria Ristorante Grosso Pomodoro",
+          "category": "restaurant",
+          "phone": "3387020841",
+          "website": "https://www.pizzeriagrossopomodoro.it/"
+        },
+        {
+          "name": "Sunrise Garden",
+          "category": "bar",
+          "phone": "+393478043179",
+          "website": "https://www.instagram.com/sunrise_garden_padova?igsh=MWI4bzVkZDVkNHZ4cQ%3D%3D&utm_source=qr"
+        },
+        {
+          "name": "McCafé",
+          "category": "coffee_shop",
+          "phone": null,
+          "website": "https://www.mcdonalds.it/ristorante/veneto/padova/padova-ovest"
+        },
+        {
+          "name": "Food Stop by Autogrill",
+          "category": "bar",
+          "phone": "049 687441",
+          "website": "https://www.autogrill.it/"
+        }
+      ]
+    },
+    {
+      "hub": "Abano Terme",
+      "bundleCount": 41,
+      "overtureCount": 406,
+      "matched": 14,
+      "novel": 392,
+      "novelLiftPct": 956,
+      "overtureCompleteness": {
+        "phone": 377,
+        "website": 212,
+        "phonePct": 93,
+        "websitePct": 52
+      },
+      "novelCompleteness": {
+        "phone": 363,
+        "website": 203,
+        "phonePct": 93,
+        "websitePct": 52
+      },
+      "bundleCompleteness": {
+        "phone": 8,
+        "website": 5,
+        "phonePct": 20,
+        "websitePct": 12
+      },
+      "sampleNovel": [
+        {
+          "name": "Cantina salmaso",
+          "category": "winery",
+          "phone": null,
+          "website": null
+        },
+        {
+          "name": "Trattoria Alla Colomba",
+          "category": "restaurant",
+          "phone": "+39049794079",
+          "website": null
+        },
+        {
+          "name": "Pizzeria Ai Portici l’arte del cibo",
+          "category": "restaurant",
+          "phone": "+39049793292",
+          "website": "http://www.aiporticiturri.it/"
+        },
+        {
+          "name": "Ristorante Belvedere",
+          "category": "restaurant",
+          "phone": "+39049793423",
+          "website": "https://www.belvedereristorante.com/"
+        },
+        {
+          "name": "Ristorante Afazenda",
+          "category": "restaurant",
+          "phone": "+390495212322",
+          "website": "http://www.ristoranteafazenda.it/"
+        },
+        {
+          "name": "Bar Terris",
+          "category": "bar",
+          "phone": "+390499930621",
+          "website": null
+        },
+        {
+          "name": "La Frutteria",
+          "category": "restaurant",
+          "phone": "+390495212625",
+          "website": "http://www.frutteria.com"
+        },
+        {
+          "name": "Enotrattoria da Serafino",
+          "category": "restaurant",
+          "phone": "+390495212482",
+          "website": "http://enotecasandaniele.com/"
+        }
+      ]
+    },
+    {
+      "hub": "Cittadella",
+      "bundleCount": 44,
+      "overtureCount": 241,
+      "matched": 16,
+      "novel": 225,
+      "novelLiftPct": 511,
+      "overtureCompleteness": {
+        "phone": 220,
+        "website": 129,
+        "phonePct": 91,
+        "websitePct": 54
+      },
+      "novelCompleteness": {
+        "phone": 205,
+        "website": 119,
+        "phonePct": 91,
+        "websitePct": 53
+      },
+      "bundleCompleteness": {
+        "phone": 14,
+        "website": 2,
+        "phonePct": 32,
+        "websitePct": 5
+      },
+      "sampleNovel": [
+        {
+          "name": "Nuova Osteria sul Brenta",
+          "category": "restaurant",
+          "phone": "+393756119803",
+          "website": "https://nuovaosteriasulbrenta.it/"
+        },
+        {
+          "name": "Circolo NOI Fontaniva",
+          "category": "bar",
+          "phone": "+390495941674",
+          "website": null
+        },
+        {
+          "name": "Pavan Panificio e Pasticceria",
+          "category": "casual_eatery",
+          "phone": "+390495941866",
+          "website": null
+        },
+        {
+          "name": "Birra Single",
+          "category": "brewery",
+          "phone": "+393484230142",
+          "website": "https://www.birrasingle.com/"
+        },
+        {
+          "name": "Ristorante Da Godi",
+          "category": "restaurant",
+          "phone": "+390495941426",
+          "website": null
+        },
+        {
+          "name": "Black Rose Fontaniva",
+          "category": "bar",
+          "phone": null,
+          "website": null
+        },
+        {
+          "name": "Trattoria Il Campanello",
+          "category": "restaurant",
+          "phone": "+390495973443",
+          "website": "http://www.sisal.com"
+        },
+        {
+          "name": "Furin Sushi",
+          "category": "restaurant",
+          "phone": "393317723333",
+          "website": "http://furinsushi.it/"
+        }
+      ]
+    },
+    {
+      "hub": "Treviso",
+      "bundleCount": 226,
+      "overtureCount": 787,
+      "matched": 107,
+      "novel": 680,
+      "novelLiftPct": 301,
+      "overtureCompleteness": {
+        "phone": 728,
+        "website": 431,
+        "phonePct": 93,
+        "websitePct": 55
+      },
+      "novelCompleteness": {
+        "phone": 621,
+        "website": 364,
+        "phonePct": 91,
+        "websitePct": 54
+      },
+      "bundleCompleteness": {
+        "phone": 45,
+        "website": 51,
+        "phonePct": 20,
+        "websitePct": 23
+      },
+      "sampleNovel": [
+        {
+          "name": "Marenda",
+          "category": "restaurant",
+          "phone": "+390422430611",
+          "website": null
+        },
+        {
+          "name": "Osteria al Borgo Antico",
+          "category": "restaurant",
+          "phone": "+390422491535",
+          "website": "http://www.osteriaalborgoantico.it"
+        },
+        {
+          "name": "Panificio Eredi Favaretto Cesare & C. dal 1962",
+          "category": "restaurant",
+          "phone": "0422380582",
+          "website": "https://www.panificioeredifavarettocesare.it/"
+        },
+        {
+          "name": "Al Centrale",
+          "category": "restaurant",
+          "phone": "+390422382265",
+          "website": "http://www.alcentrale.it"
+        },
+        {
+          "name": "Caffè Da Vinci",
+          "category": "cafe",
+          "phone": "+390422491444",
+          "website": "http://www.caffedavinci.it"
+        },
+        {
+          "name": "La Tagliata Di Luca Food Truck",
+          "category": "restaurant",
+          "phone": "393315262847",
+          "website": null
+        },
+        {
+          "name": "Pasticceria Marchesi di Panebianco Maurizio",
+          "category": "casual_eatery",
+          "phone": "+390422380537",
+          "website": "http://www.pasticceriadosson.it/"
+        },
+        {
+          "name": "Bottega della pizza - Dosson",
+          "category": "restaurant",
+          "phone": "+390422277510",
+          "website": null
+        }
+      ]
+    },
+    {
+      "hub": "Castelfranco Veneto",
+      "bundleCount": 60,
+      "overtureCount": 280,
+      "matched": 23,
+      "novel": 257,
+      "novelLiftPct": 428,
+      "overtureCompleteness": {
+        "phone": 257,
+        "website": 149,
+        "phonePct": 92,
+        "websitePct": 53
+      },
+      "novelCompleteness": {
+        "phone": 236,
+        "website": 134,
+        "phonePct": 92,
+        "websitePct": 52
+      },
+      "bundleCompleteness": {
+        "phone": 19,
+        "website": 19,
+        "phonePct": 32,
+        "websitePct": 32
+      },
+      "sampleNovel": [
+        {
+          "name": "Al Solito Posto",
+          "category": "restaurant",
+          "phone": "+390423715064",
+          "website": "https://website-522904865041406159787-pizzarestaurant.business.site"
+        },
+        {
+          "name": "Jolly bar resana",
+          "category": "bar",
+          "phone": null,
+          "website": null
+        },
+        {
+          "name": "Pizzeria La Fenice",
+          "category": "restaurant",
+          "phone": "+390423715128",
+          "website": null
+        },
+        {
+          "name": "Pasticceria Dolce Zoe",
+          "category": "casual_eatery",
+          "phone": "+390423495908",
+          "website": null
+        },
+        {
+          "name": "Ristorante da Mauro",
+          "category": "restaurant",
+          "phone": "+393474797258",
+          "website": null
+        },
+        {
+          "name": "Bar Storico",
+          "category": "bar",
+          "phone": "+393341627306",
+          "website": null
+        },
+        {
+          "name": "Asgard Pub Resana",
+          "category": "bar",
+          "phone": "393805856919",
+          "website": null
+        },
+        {
+          "name": "Poste Italiane",
+          "category": "restaurant",
+          "phone": null,
+          "website": "http://www.poste.it/"
+        }
+      ]
+    },
+    {
+      "hub": "Conegliano",
+      "bundleCount": 117,
+      "overtureCount": 464,
+      "matched": 56,
+      "novel": 408,
+      "novelLiftPct": 349,
+      "overtureCompleteness": {
+        "phone": 422,
+        "website": 235,
+        "phonePct": 91,
+        "websitePct": 51
+      },
+      "novelCompleteness": {
+        "phone": 368,
+        "website": 212,
+        "phonePct": 90,
+        "websitePct": 52
+      },
+      "bundleCompleteness": {
+        "phone": 18,
+        "website": 10,
+        "phonePct": 15,
+        "websitePct": 9
+      },
+      "sampleNovel": [
+        {
+          "name": "La Vigna",
+          "category": "restaurant",
+          "phone": "+39043862430",
+          "website": "http://www.ristorantelavigna.com"
+        },
+        {
+          "name": "Tenuta San Benedetto",
+          "category": "winery",
+          "phone": "393486256324",
+          "website": "https://www.tenutasanbenedetto.it/"
+        },
+        {
+          "name": "Sommariva Societa Agricola Palazzo Rosso",
+          "category": "winery",
+          "phone": "+390438784316",
+          "website": "http://www.sommariva-vini.it/"
+        },
+        {
+          "name": "Al San Michele",
+          "category": "restaurant",
+          "phone": "+390438936499",
+          "website": "https://www.tripadvisor.co.uk/Restaurant_Review-g187869-d20988758-Reviews-Al_San_Michele_Ristorante_Pizzeria-Treviso_Province_of_Treviso_Veneto.html?m=19905"
+        },
+        {
+          "name": "Hemp Secco 420",
+          "category": "winery",
+          "phone": "393483061427",
+          "website": "https://www.hempsecco420.eu/"
+        },
+        {
+          "name": "Zinto wine",
+          "category": "winery",
+          "phone": "+393487467039",
+          "website": "http://www.zintowine.it/"
+        },
+        {
+          "name": "Società Agricola Da Lozzo Romeo Ed Enrico - Zinto",
+          "category": "winery",
+          "phone": "393487467039",
+          "website": "http://www.zintowine.com/"
+        },
+        {
+          "name": "Osteria Antica Guizza",
+          "category": "restaurant",
+          "phone": "+3904381893012",
+          "website": "http://www.osteriaguizza.it/"
+        }
+      ]
+    },
+    {
+      "hub": "Montebelluna",
+      "bundleCount": 66,
+      "overtureCount": 287,
+      "matched": 19,
+      "novel": 268,
+      "novelLiftPct": 406,
+      "overtureCompleteness": {
+        "phone": 267,
+        "website": 136,
+        "phonePct": 93,
+        "websitePct": 47
+      },
+      "novelCompleteness": {
+        "phone": 248,
+        "website": 127,
+        "phonePct": 93,
+        "websitePct": 47
+      },
+      "bundleCompleteness": {
+        "phone": 14,
+        "website": 8,
+        "phonePct": 21,
+        "websitePct": 12
+      },
+      "sampleNovel": [
+        {
+          "name": "Ital-Com SRL",
+          "category": "restaurant",
+          "phone": null,
+          "website": null
+        },
+        {
+          "name": "bar dopodiché ",
+          "category": "bar",
+          "phone": "+393470551994",
+          "website": null
+        },
+        {
+          "name": "Al Nuovo Ponte",
+          "category": "bar",
+          "phone": null,
+          "website": null
+        },
+        {
+          "name": "Trattoria Da Ciccio",
+          "category": "restaurant",
+          "phone": "+39042385543",
+          "website": "http://www.daciccio.it/"
+        },
+        {
+          "name": "Antico Forno",
+          "category": "casual_eatery",
+          "phone": "+390423650200",
+          "website": null
+        },
+        {
+          "name": "Birrificio Tingo beer",
+          "category": "brewery",
+          "phone": "+393409386029",
+          "website": "https://www.tingobeer.com/"
+        },
+        {
+          "name": "Tabaccheria & Bar Fortuna - Ricevitoria Lotto - Superenalotto - Gratta E Vinci - Punto Lis - Sala Slot",
+          "category": "bar",
+          "phone": null,
+          "website": null
+        },
+        {
+          "name": "Pizzeria Birreria Pub Zuita",
+          "category": "bar",
+          "phone": null,
+          "website": "https://www.facebook.com/people/Birreria-Zuita/100063473233633/"
+        }
+      ]
+    },
+    {
+      "hub": "Vittorio Veneto",
+      "bundleCount": 0,
+      "overtureCount": 128,
+      "matched": 0,
+      "novel": 128,
+      "novelLiftPct": 100,
+      "overtureCompleteness": {
+        "phone": 123,
+        "website": 62,
+        "phonePct": 96,
+        "websitePct": 48
+      },
+      "novelCompleteness": {
+        "phone": 123,
+        "website": 62,
+        "phonePct": 96,
+        "websitePct": 48
+      },
+      "bundleCompleteness": {
+        "phone": 0,
+        "website": 0,
+        "phonePct": 0,
+        "websitePct": 0
+      },
+      "sampleNovel": [
+        {
+          "name": "Azienda Agricola Vignarosa",
+          "category": "winery",
+          "phone": "+390438200230",
+          "website": "https://www.vignarosa.it/"
+        },
+        {
+          "name": "Osteria Caronelli",
+          "category": "restaurant",
+          "phone": "+393274060030",
+          "website": "http://www.osteriacaronelli.it/"
+        },
+        {
+          "name": "Panificio La Coccinella",
+          "category": "casual_eatery",
+          "phone": "+39043839706",
+          "website": null
+        },
+        {
+          "name": "Arte Pizza di Paludetti Denis",
+          "category": "restaurant",
+          "phone": "+393284828714",
+          "website": null
+        },
+        {
+          "name": "Tenute Ca’ dei Boz Winery",
+          "category": "winery",
+          "phone": "+393516883345",
+          "website": "http://www.cadeiboz.it/"
+        },
+        {
+          "name": "Massimo Coletti Vini",
+          "category": "winery",
+          "phone": "+393701522227",
+          "website": null
+        },
+        {
+          "name": "4+1 Amici Al Bar",
+          "category": "bar",
+          "phone": "+390438998164",
+          "website": null
+        },
+        {
+          "name": "Gelateria De Martin",
+          "category": "casual_eatery",
+          "phone": "+393426252596",
+          "website": "http://www.gelateriademartin.it/"
+        }
+      ]
+    },
+    {
+      "hub": "Valdobbiadene",
+      "bundleCount": 0,
+      "overtureCount": 369,
+      "matched": 0,
+      "novel": 369,
+      "novelLiftPct": 100,
+      "overtureCompleteness": {
+        "phone": 344,
+        "website": 251,
+        "phonePct": 93,
+        "websitePct": 68
+      },
+      "novelCompleteness": {
+        "phone": 344,
+        "website": 251,
+        "phonePct": 93,
+        "websitePct": 68
+      },
+      "bundleCompleteness": {
+        "phone": 0,
+        "website": 0,
+        "phonePct": 0,
+        "websitePct": 0
+      },
+      "sampleNovel": [
+        {
+          "name": "32 Via dei birrai",
+          "category": "brewery",
+          "phone": "+390423681983",
+          "website": "https://www.32viadeibirrai.it/"
+        },
+        {
+          "name": "Shiko' Lounge and Restaurant - Pederobba",
+          "category": "restaurant",
+          "phone": "+393519886680",
+          "website": "http://www.ristoranteshiko.it/"
+        },
+        {
+          "name": "Trattoria Paninoteca La Vittoriana",
+          "category": "restaurant",
+          "phone": "+390423688134",
+          "website": null
+        },
+        {
+          "name": "Spiga d'Oro",
+          "category": "restaurant",
+          "phone": "+390423689090",
+          "website": "http://Www.listino.cloud/v6AG9eF0434_1_1/"
+        },
+        {
+          "name": "Caffetteria il kikko",
+          "category": "cafe",
+          "phone": "+393403845404",
+          "website": null
+        },
+        {
+          "name": "Shara's Pizzeria",
+          "category": "restaurant",
+          "phone": "+39042369755",
+          "website": "https://www.passeggiatetreviso.it/pizzeria-sharas-pederobba"
+        },
+        {
+          "name": "Macchie Di Vino",
+          "category": "bar",
+          "phone": "+393397791031",
+          "website": null
+        },
+        {
+          "name": "Pizzarte",
+          "category": "restaurant",
+          "phone": "+393889922274",
+          "website": null
+        }
+      ]
+    },
+    {
+      "hub": "Asolo",
+      "bundleCount": 0,
+      "overtureCount": 165,
+      "matched": 0,
+      "novel": 165,
+      "novelLiftPct": 100,
+      "overtureCompleteness": {
+        "phone": 156,
+        "website": 90,
+        "phonePct": 95,
+        "websitePct": 55
+      },
+      "novelCompleteness": {
+        "phone": 156,
+        "website": 90,
+        "phonePct": 95,
+        "websitePct": 55
+      },
+      "bundleCompleteness": {
+        "phone": 0,
+        "website": 0,
+        "phonePct": 0,
+        "websitePct": 0
+      },
+      "sampleNovel": [
+        {
+          "name": "Asolo Manor Wine",
+          "category": "winery",
+          "phone": "393495234911",
+          "website": "https://www.asolomanor.it/"
+        },
+        {
+          "name": "Ristorante, Bar - Osteria Longon",
+          "category": "restaurant",
+          "phone": "+390423565276",
+          "website": null
+        },
+        {
+          "name": "Henry's Bar Bistrot & Bottega",
+          "category": "bar",
+          "phone": "+390423522002",
+          "website": "http://www.eatlikeastar.com/"
+        },
+        {
+          "name": "Gala Asolo | Asolo",
+          "category": "bar",
+          "phone": "+390423529100",
+          "website": "https://www.gala-asolo.it/"
+        },
+        {
+          "name": "Hosteria Di Lancio",
+          "category": "restaurant",
+          "phone": "+390423950495",
+          "website": "http://www.hosteriadilancio.com"
+        },
+        {
+          "name": "La Pizza Da Mario",
+          "category": "restaurant",
+          "phone": "390423627860",
+          "website": null
+        },
+        {
+          "name": "Sottopasso Pizzeria",
+          "category": "restaurant",
+          "phone": "+390423627860",
+          "website": "http://www.lapizzadamario.it/"
+        },
+        {
+          "name": "Sottopasso pizzeria",
+          "category": "restaurant",
+          "phone": "+390423627860",
+          "website": "http://www.lapizzadamario.it/"
+        }
+      ]
+    },
+    {
+      "hub": "Vicenza",
+      "bundleCount": 343,
+      "overtureCount": 826,
+      "matched": 138,
+      "novel": 688,
+      "novelLiftPct": 201,
+      "overtureCompleteness": {
+        "phone": 747,
+        "website": 393,
+        "phonePct": 90,
+        "websitePct": 48
+      },
+      "novelCompleteness": {
+        "phone": 615,
+        "website": 313,
+        "phonePct": 89,
+        "websitePct": 45
+      },
+      "bundleCompleteness": {
+        "phone": 100,
+        "website": 77,
+        "phonePct": 29,
+        "websitePct": 22
+      },
+      "sampleNovel": [
+        {
+          "name": "Da Raed Pizza & Kebab Vicenza",
+          "category": "restaurant",
+          "phone": "+393275949609",
+          "website": null
+        },
+        {
+          "name": "Dai Birbanti",
+          "category": "restaurant",
+          "phone": "3904441343588",
+          "website": null
+        },
+        {
+          "name": "Gelateria San Marco",
+          "category": "casual_eatery",
+          "phone": "+390444532145",
+          "website": null
+        },
+        {
+          "name": "Trattoria Pizzeria AL Tormeno",
+          "category": "restaurant",
+          "phone": "+390444533130",
+          "website": "http://www.ristorantealtormeno.com"
+        },
+        {
+          "name": "Antica trattoria da Mario",
+          "category": "restaurant",
+          "phone": "+390444530076",
+          "website": null
+        },
+        {
+          "name": "Pasticceria Farisato",
+          "category": "casual_eatery",
+          "phone": "+390444530462",
+          "website": "http://www.farisato.com/"
+        },
+        {
+          "name": "Jin Gu",
+          "category": "restaurant",
+          "phone": "+390444530888",
+          "website": "http://jingu.placeweb.site"
+        },
+        {
+          "name": "Bar Albatros",
+          "category": "bar",
+          "phone": null,
+          "website": null
+        }
+      ]
+    },
+    {
+      "hub": "Bassano del Grappa",
+      "bundleCount": 191,
+      "overtureCount": 533,
+      "matched": 81,
+      "novel": 452,
+      "novelLiftPct": 237,
+      "overtureCompleteness": {
+        "phone": 494,
+        "website": 264,
+        "phonePct": 93,
+        "websitePct": 50
+      },
+      "novelCompleteness": {
+        "phone": 416,
+        "website": 217,
+        "phonePct": 92,
+        "websitePct": 48
+      },
+      "bundleCompleteness": {
+        "phone": 36,
+        "website": 23,
+        "phonePct": 19,
+        "websitePct": 12
+      },
+      "sampleNovel": [
+        {
+          "name": "Pizza Da Asporto La Piazzetta",
+          "category": "restaurant",
+          "phone": "39042485078",
+          "website": null
+        },
+        {
+          "name": "Dolce Caffe",
+          "category": "bar",
+          "phone": null,
+          "website": null
+        },
+        {
+          "name": "Trattoria da Rino e Sandra",
+          "category": "restaurant",
+          "phone": "+390424581483",
+          "website": null
+        },
+        {
+          "name": "Il Covo del Ribelle",
+          "category": "restaurant",
+          "phone": "0424580322",
+          "website": "http://www.ilcovodelribelle.com/"
+        },
+        {
+          "name": "Al Chiosco - Food&Drinks",
+          "category": "bar",
+          "phone": "+393791324954",
+          "website": "https://www.instagram.com/alchiosco_cadolfin"
+        },
+        {
+          "name": "Bar Meneghetti Vanni & C. SNC",
+          "category": "bar",
+          "phone": "0424 580553",
+          "website": "http://www.sisal.com"
+        },
+        {
+          "name": "Forno Artigiano Moretti",
+          "category": "casual_eatery",
+          "phone": "+390424581479",
+          "website": null
+        },
+        {
+          "name": "Pizzeria Come Vuoi Tu Rosà",
+          "category": "restaurant",
+          "phone": "+390424581253",
+          "website": "http://www.pizzeriacomevuoitu.it"
+        }
+      ]
+    },
+    {
+      "hub": "Schio",
+      "bundleCount": 94,
+      "overtureCount": 292,
+      "matched": 35,
+      "novel": 257,
+      "novelLiftPct": 273,
+      "overtureCompleteness": {
+        "phone": 264,
+        "website": 127,
+        "phonePct": 90,
+        "websitePct": 43
+      },
+      "novelCompleteness": {
+        "phone": 230,
+        "website": 109,
+        "phonePct": 89,
+        "websitePct": 42
+      },
+      "bundleCompleteness": {
+        "phone": 62,
+        "website": 25,
+        "phonePct": 66,
+        "websitePct": 27
+      },
+      "sampleNovel": [
+        {
+          "name": "Bar bruschetteria rivendita vino Al Calice D’Oro",
+          "category": "bar",
+          "phone": "+390445640984",
+          "website": null
+        },
+        {
+          "name": "Al Borghetto",
+          "category": "restaurant",
+          "phone": "+390445649090",
+          "website": "http://www.trattoriaalborghetto.it/"
+        },
+        {
+          "name": "Pizzeria Il Piccolo Ritrovo",
+          "category": "bar",
+          "phone": "+393392635483",
+          "website": "https://www.instagram.com/il_piccolo_ritrovo_"
+        },
+        {
+          "name": "Pizzeria Valleogra",
+          "category": "restaurant",
+          "phone": "+390445661273",
+          "website": null
+        },
+        {
+          "name": "On The Road Santorso",
+          "category": "bar",
+          "phone": "+3904451922611",
+          "website": null
+        },
+        {
+          "name": "Barbapizza",
+          "category": "restaurant",
+          "phone": "+390445640657",
+          "website": null
+        },
+        {
+          "name": "Panificio Dotto",
+          "category": "casual_eatery",
+          "phone": "+390445641248",
+          "website": "https://www.instagram.com/panificio_dotto/"
+        },
+        {
+          "name": "Trattoria Diana",
+          "category": "restaurant",
+          "phone": "+390445635335",
+          "website": null
+        }
+      ]
+    },
+    {
+      "hub": "Thiene",
+      "bundleCount": 49,
+      "overtureCount": 343,
+      "matched": 18,
+      "novel": 325,
+      "novelLiftPct": 663,
+      "overtureCompleteness": {
+        "phone": 315,
+        "website": 157,
+        "phonePct": 92,
+        "websitePct": 46
+      },
+      "novelCompleteness": {
+        "phone": 297,
+        "website": 149,
+        "phonePct": 91,
+        "websitePct": 46
+      },
+      "bundleCompleteness": {
+        "phone": 22,
+        "website": 12,
+        "phonePct": 45,
+        "websitePct": 24
+      },
+      "sampleNovel": [
+        {
+          "name": "Bar Vineria Parpagnacco",
+          "category": "bar",
+          "phone": "+393713755066",
+          "website": "http://www.vineriaparpagnacco.com/"
+        },
+        {
+          "name": "Pizzeria Da Moreno",
+          "category": "restaurant",
+          "phone": "+390445561155",
+          "website": "http://www.pizzeriacuorenapoletano.com/"
+        },
+        {
+          "name": "Cuore Napoletano",
+          "category": "restaurant",
+          "phone": "0445 621202",
+          "website": "http://www.pizzeriacuorenapoletano.it"
+        },
+        {
+          "name": "La Cicala",
+          "category": "restaurant",
+          "phone": null,
+          "website": "http://www.ristorantelacicala.com"
+        },
+        {
+          "name": "Pizzeria Green Two Marano",
+          "category": "restaurant",
+          "phone": null,
+          "website": "http://www.greenpizza.it/greenPizzaMARANO/pizzamarano.html"
+        },
+        {
+          "name": "Dolce Forno",
+          "category": "casual_eatery",
+          "phone": "+390445042344",
+          "website": null
+        },
+        {
+          "name": "Sadibuono",
+          "category": "casual_eatery",
+          "phone": "+393515041317",
+          "website": "https://sadibuono.it/"
+        },
+        {
+          "name": "Bar Mutuo Soccorso",
+          "category": "bar",
+          "phone": "+390445621950",
+          "website": null
+        }
+      ]
+    },
+    {
+      "hub": "Marostica",
+      "bundleCount": 3,
+      "overtureCount": 208,
+      "matched": 0,
+      "novel": 208,
+      "novelLiftPct": 6933,
+      "overtureCompleteness": {
+        "phone": 198,
+        "website": 97,
+        "phonePct": 95,
+        "websitePct": 47
+      },
+      "novelCompleteness": {
+        "phone": 198,
+        "website": 97,
+        "phonePct": 95,
+        "websitePct": 47
+      },
+      "bundleCompleteness": {
+        "phone": 0,
+        "website": 0,
+        "phonePct": 0,
+        "websitePct": 0
+      },
+      "sampleNovel": [
+        {
+          "name": "Osteria Inosteria",
+          "category": "restaurant",
+          "phone": "+390424702460",
+          "website": "http://www.inosteria.it"
+        },
+        {
+          "name": "La Rondinella di Crestani Alessandra",
+          "category": "restaurant",
+          "phone": "+390424709421",
+          "website": null
+        },
+        {
+          "name": "Arte Della Pizza",
+          "category": "restaurant",
+          "phone": "+390424702090",
+          "website": null
+        },
+        {
+          "name": "Trattoria Da Toi",
+          "category": "restaurant",
+          "phone": "+39042472150",
+          "website": "http://www.trattoriadatoi.it/"
+        },
+        {
+          "name": "Bistrot 59 Ristorantino",
+          "category": "restaurant",
+          "phone": "0424 72271",
+          "website": "https://www.bistrot59ristorantino.it"
+        },
+        {
+          "name": "Trattoria da Agnese",
+          "category": "restaurant",
+          "phone": "+390424702018",
+          "website": "https://trattoriadaagnese.it/"
+        },
+        {
+          "name": "La Rondinella",
+          "category": "restaurant",
+          "phone": "+390424709421",
+          "website": "http://www.ristoratoriconco.com/index.php/ristorante-la-rondinella"
+        },
+        {
+          "name": "Ai Capitei Trattoria Pizzeria Al Santuario",
+          "category": "restaurant",
+          "phone": "+39042477266",
+          "website": null
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "overture": 6783,
+    "matched": 720,
+    "novel": 6063,
+    "avgNovelLiftPct": 787
+  }
+}

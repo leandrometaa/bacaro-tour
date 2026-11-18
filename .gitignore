@@ -37,3 +37,9 @@ Thumbs.db
 
 # Misc
 *.tsbuildinfo
+
+# Data tooling (DuckDB binary + Overture cache)
+scripts/.tools/
+scripts/.cache/
+scripts/*.zip
+scripts/**/*.zip

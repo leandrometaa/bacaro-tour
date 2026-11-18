@@ -1,0 +1,42 @@
+{
+  "generatedAt": "2026-11-17T15:46:54.278Z",
+  "decision": "INTEGRATE_OVERTURE_OFFLINE",
+  "thresholds": {
+    "MIN_LIFT_PCT": 25,
+    "MIN_NOVEL_PHONE_PCT": 40
+  },
+  "metrics": {
+    "avgNovelLiftPct": 229,
+    "novelPhonePct": 90,
+    "novelWebsitePct": 48,
+    "novelCount": 2381,
+    "matchedCount": 432
+  },
+  "funnelHighlights": [
+    {
+      "hub": "Padova",
+      "bundle": 498,
+      "liveAfterCap": 150,
+      "afterMerge": 528,
+      "openNowEligible": 194,
+      "photoPct": 0
+    },
+    {
+      "hub": "Vicenza",
+      "bundle": 343,
+      "liveAfterCap": 150,
+      "afterMerge": 371,
+      "openNowEligible": 62,
+      "photoPct": 0
+    },
+    {
+      "hub": "Bassano del Grappa",
+      "bundle": 191,
+      "liveAfterCap": 150,
+      "afterMerge": 232,
+      "openNowEligible": 33,
+      "photoPct": 0
+    }
+  ],
+  "rationale": "Overture adds large density and much better phone/website completeness than OSM bundle. Proceed with offline merge (source-tagged), not a live API dependency."
+}

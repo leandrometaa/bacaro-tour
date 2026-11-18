@@ -14,15 +14,11 @@ export async function searchLocation(query: string): Promise<GeocodingResult[]> 
     url.searchParams.set('limit', '5');
     url.searchParams.set('countrycodes', 'it');
 
-    // Browser UA is sent automatically; Referer identifies Bacaro Tour for Nominatim policy.
+    // Custom Referer/UA are ignored by fetch in browsers; Accept-Language is fine.
     const response = await fetch(url.toString(), {
       headers: {
         'Accept-Language': 'it',
         Accept: 'application/json',
-        Referer:
-          typeof window !== 'undefined'
-            ? window.location.href
-            : 'https://bacaro-tour.local/',
       },
     });
 
@@ -56,10 +52,6 @@ export async function reverseGeocode(
       headers: {
         'Accept-Language': 'it',
         Accept: 'application/json',
-        Referer:
-          typeof window !== 'undefined'
-            ? window.location.href
-            : 'https://bacaro-tour.local/',
       },
     });
 
