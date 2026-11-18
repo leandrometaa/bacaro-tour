@@ -1,13 +1,19 @@
 /**
  * Server-side Overpass proxy for Bacaro Tour (Vercel serverless).
  * Avoids flaky browser→Overpass calls (timeouts, blocking).
+ *
+ * Overpass returns HTTP 406 for missing/default library User-Agents
+ * (Node fetch, axios, etc.). Identify the app explicitly.
  */
 const MIRRORS = [
   'https://overpass-api.de/api/interpreter',
   'https://overpass.openstreetmap.fr/api/interpreter',
+  'https://overpass.kumi.systems/api/interpreter',
 ];
 
 const TIMEOUT_MS = 22_000;
+const USER_AGENT =
+  'BacaroTour/1.0 (+https://bacaro-tour-iota.vercel.app; OSM data consumer)';
 
 type VercelRequest = {
   method?: string;
@@ -52,7 +58,8 @@ async function fetchMirror(
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        Accept: 'application/json',
+        Accept: 'application/json, text/plain, */*',
+        'User-Agent': USER_AGENT,
       },
       body: `data=${encodeURIComponent(query)}`,
       signal: controller.signal,

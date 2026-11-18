@@ -44,6 +44,8 @@ export default defineConfig({
       },
       workbox: {
         navigateFallback: '/index.html',
+        // Never serve the SPA shell for serverless API routes.
+        navigateFallbackDenylist: [/^\/api\//],
         // Venue bundles (OSM + Overture) push the main chunk above the 2 MiB default.
         maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
