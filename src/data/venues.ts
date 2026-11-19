@@ -34,15 +34,15 @@ function prioritizeAndCap(
   venues: Venue[],
   center: [number, number]
 ): { venues: Venue[]; truncated: boolean } {
+  // Cap by distance first so "vicini" stays meaningful; hours/contacts only
+  // break ties among equally near venues.
   const scored = [...venues].sort((a, b) => {
-    // Prefer venues with hours, then contacts, then nearer.
-    const score = (v: Venue) =>
-      (v.hasHours ? 4 : 0) +
-      (v.phone ? 1 : 0) +
-      (v.website ? 1 : 0);
-    const d = score(b) - score(a);
-    if (d !== 0) return d;
-    return haversineKm(center, a.coordinates) - haversineKm(center, b.coordinates);
+    const distA = haversineKm(center, a.coordinates);
+    const distB = haversineKm(center, b.coordinates);
+    if (distA !== distB) return distA - distB;
+    const richness = (v: Venue) =>
+      (v.hasHours ? 2 : 0) + (v.phone ? 1 : 0) + (v.website ? 1 : 0);
+    return richness(b) - richness(a);
   });
   const truncated = scored.length > VENUE_DISPLAY_CAP;
   return { venues: scored.slice(0, VENUE_DISPLAY_CAP), truncated };

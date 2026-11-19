@@ -59,5 +59,30 @@ describe('regional bundle', () => {
     expect(named.length).toBe(1);
     expect(named[0].source).toBe('osm');
   });
+
+  it('mergeRegionalVenues dedupes same phone within ~180 m', () => {
+    const twin: Venue = {
+      ...base,
+      id: 'overture-phone-dup',
+      name: 'Locale Test Padova Centro',
+      source: 'overture',
+      phone: '+39 049 1234567',
+      coordinates: [45.4072, 11.8775],
+    };
+    const withPhone: Venue = {
+      ...base,
+      phone: '0491234567',
+    };
+    const merged = mergeRegionalVenues(
+      [withPhone, twin],
+      [45.4064, 11.8768],
+      5
+    );
+    const hits = merged.filter(
+      (v) => v.id === withPhone.id || v.id === twin.id
+    );
+    expect(hits.length).toBe(1);
+    expect(hits[0].source).toBe('osm');
+  });
 });
 

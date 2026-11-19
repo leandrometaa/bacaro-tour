@@ -49,7 +49,10 @@ const NOISY_OVERTURE_CATEGORIES = new Set([
   'supermarket',
 ]);
 
-const DUP_MATCH_KM = 0.08; // ~80 m
+/** Tight radius for fuzzy name matches. */
+const DUP_TIGHT_KM = 0.08; // ~80 m
+/** Wider radius when phone/website/exact-name strongly agree. */
+const DUP_LOOSE_KM = 0.18; // ~180 m
 
 function isRealPhoto(src: string): boolean {
   return Boolean(src) && !src.startsWith('category:');
@@ -62,6 +65,26 @@ function normalizeName(name: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
+}
+
+function normalizePhone(phone?: string | null): string | null {
+  if (!phone) return null;
+  const digits = phone.replace(/\D+/g, '');
+  if (digits.length < 7) return null;
+  // Compare on the last 9–10 digits (IT mobile/landline without country prefix).
+  return digits.slice(-10);
+}
+
+function normalizeWebHost(website?: string | null): string | null {
+  if (!website) return null;
+  try {
+    const url = new URL(
+      website.startsWith('http') ? website : `https://${website}`
+    );
+    return url.hostname.replace(/^www\./, '').toLowerCase() || null;
+  } catch {
+    return null;
+  }
 }
 
 function namesSimilar(a: string, b: string): boolean {
@@ -78,18 +101,66 @@ function namesSimilar(a: string, b: string): boolean {
   return inter / Math.min(ta.size, tb.size) >= 0.6;
 }
 
+type DupCandidate = {
+  name: string;
+  coordinates: [number, number];
+  phone?: string | null;
+  website?: string | null;
+};
+
 function isNearDuplicate(
-  candidate: { name: string; coordinates: [number, number] },
-  existing: { name: string; coordinates: [number, number] }[]
+  candidate: DupCandidate,
+  existing: DupCandidate[]
 ): boolean {
+  const cPhone = normalizePhone(candidate.phone);
+  const cWeb = normalizeWebHost(candidate.website);
+  const cName = normalizeName(candidate.name);
+
   for (const v of existing) {
-    if (haversineKm(candidate.coordinates, v.coordinates) > DUP_MATCH_KM) {
-      continue;
-    }
-    // Same/similar name within ~80 m → duplicate. Same coords, different names → keep both.
-    if (namesSimilar(candidate.name, v.name)) return true;
+    const dist = haversineKm(candidate.coordinates, v.coordinates);
+    if (dist > DUP_LOOSE_KM) continue;
+
+    const phoneMatch =
+      Boolean(cPhone) && cPhone === normalizePhone(v.phone);
+    const webMatch =
+      Boolean(cWeb) && cWeb === normalizeWebHost(v.website);
+    const exactName = Boolean(cName) && cName === normalizeName(v.name);
+    const fuzzyName = namesSimilar(candidate.name, v.name);
+
+    // Strong identity signals tolerate a wider gap (OSM vs Overture drift).
+    if ((phoneMatch || webMatch) && dist <= DUP_LOOSE_KM) return true;
+    if (exactName && dist <= DUP_LOOSE_KM) return true;
+    // Fuzzy name only within the tight radius.
+    if (fuzzyName && dist <= DUP_TIGHT_KM) return true;
   }
   return false;
+}
+
+function findDuplicateIndex(
+  candidate: DupCandidate,
+  existing: DupCandidate[]
+): number {
+  const cPhone = normalizePhone(candidate.phone);
+  const cWeb = normalizeWebHost(candidate.website);
+  const cName = normalizeName(candidate.name);
+
+  for (let i = 0; i < existing.length; i++) {
+    const v = existing[i];
+    const dist = haversineKm(candidate.coordinates, v.coordinates);
+    if (dist > DUP_LOOSE_KM) continue;
+
+    const phoneMatch =
+      Boolean(cPhone) && cPhone === normalizePhone(v.phone);
+    const webMatch =
+      Boolean(cWeb) && cWeb === normalizeWebHost(v.website);
+    const exactName = Boolean(cName) && cName === normalizeName(v.name);
+    const fuzzyName = namesSimilar(candidate.name, v.name);
+
+    if ((phoneMatch || webMatch) && dist <= DUP_LOOSE_KM) return i;
+    if (exactName && dist <= DUP_LOOSE_KM) return i;
+    if (fuzzyName && dist <= DUP_TIGHT_KM) return i;
+  }
+  return -1;
 }
 
 function isNoisyOverture(entry: RegionalBundleEntry): boolean {
@@ -231,25 +302,16 @@ export function mergeRegionalVenues(
     (a, b) =>
       haversineKm(center, a.coordinates) - haversineKm(center, b.coordinates)
   )) {
-    if (isNearDuplicate(v, deduped)) {
-      // Prefer keeping OSM; if current is OSM and previous was overture, replace.
-      const idx = deduped.findIndex(
-        (d) =>
-          haversineKm(v.coordinates, d.coordinates) <= DUP_MATCH_KM &&
-          namesSimilar(v.name, d.name)
-      );
-      if (
-        idx >= 0 &&
-        v.source === 'osm' &&
-        deduped[idx].source === 'overture'
-      ) {
-        const kept = {
+    const idx = findDuplicateIndex(v, deduped);
+    if (idx >= 0) {
+      // Prefer keeping OSM; merge contacts either way.
+      if (v.source === 'osm' && deduped[idx].source === 'overture') {
+        deduped[idx] = {
           ...v,
           phone: v.phone || deduped[idx].phone,
           website: v.website || deduped[idx].website,
         };
-        deduped[idx] = kept;
-      } else if (idx >= 0) {
+      } else {
         deduped[idx] = {
           ...deduped[idx],
           phone: deduped[idx].phone || v.phone,

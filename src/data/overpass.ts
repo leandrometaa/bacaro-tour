@@ -240,8 +240,12 @@ function parseOverpassPayload(data: OverpassResponse & { error?: string }): Over
   };
 }
 
+type ProxyPayload =
+  | { lat: number; lon: number; radiusKm: number }
+  | { osmType: 'node' | 'way' | 'relation'; osmId: number };
+
 async function fetchViaProxy(
-  query: string,
+  payload: ProxyPayload,
   signal?: AbortSignal
 ): Promise<OverpassFetchOk> {
   const timeoutController = new AbortController();
@@ -253,13 +257,21 @@ async function fetchViaProxy(
   );
 
   try {
-    const response = await fetch(PROXY_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify({ query }),
+    // Prefer GET for area searches so Vercel CDN can cache by rounded cell.
+    const useGet = 'lat' in payload;
+    const url = useGet
+      ? `${PROXY_ENDPOINT}?lat=${payload.lat}&lon=${payload.lon}&radiusKm=${payload.radiusKm}`
+      : PROXY_ENDPOINT;
+
+    const response = await fetch(url, {
+      method: useGet ? 'GET' : 'POST',
+      headers: useGet
+        ? { Accept: 'application/json' }
+        : {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+      body: useGet ? undefined : JSON.stringify(payload),
       signal: timeoutController.signal,
     });
 
@@ -347,23 +359,61 @@ async function raceBrowserMirrors(
   }
 }
 
-async function fetchOverpass(
-  query: string,
+async function fetchOverpassArea(
+  lat: number,
+  lon: number,
+  radiusKm: number,
   signal?: AbortSignal
 ): Promise<OverpassFetchOk> {
   if (signal?.aborted) {
     throw new DOMException('Aborted', 'AbortError');
   }
 
-  // Prefer Vercel proxy; on non-2xx / network / timeout, race mirrors in-browser.
+  const roundedLat = Math.round(lat * 1000) / 1000;
+  const roundedLon = Math.round(lon * 1000) / 1000;
+  const roundedRadius = Math.round(radiusKm * 10) / 10;
+
+  // Prefer Vercel proxy; on failure race public mirrors from the browser.
   try {
-    return await fetchViaProxy(query, signal);
+    return await fetchViaProxy(
+      { lat: roundedLat, lon: roundedLon, radiusKm: roundedRadius },
+      signal
+    );
   } catch (err) {
     if (err instanceof DOMException && err.name === 'AbortError' && signal?.aborted) {
       throw err;
     }
   }
 
+  const radiusM = Math.min(Math.round(roundedRadius * 1000), 30000);
+  return raceBrowserMirrors(
+    buildOverpassQuery(roundedLat, roundedLon, radiusM),
+    signal
+  );
+}
+
+async function fetchOverpassByOsmId(
+  osmType: 'node' | 'way' | 'relation',
+  osmId: number,
+  signal?: AbortSignal
+): Promise<OverpassFetchOk> {
+  if (signal?.aborted) {
+    throw new DOMException('Aborted', 'AbortError');
+  }
+
+  try {
+    return await fetchViaProxy({ osmType, osmId }, signal);
+  } catch (err) {
+    if (err instanceof DOMException && err.name === 'AbortError' && signal?.aborted) {
+      throw err;
+    }
+  }
+
+  const query = `
+[out:json][timeout:15];
+${osmType}(${osmId});
+out center tags;
+`.trim();
   return raceBrowserMirrors(query, signal);
 }
 
@@ -635,11 +685,13 @@ export async function fetchOsmVenues(
     if (cached) return cached;
   }
 
-  const radiusM = Math.min(Math.round(radiusKm * 1000), 30000);
-  const query = buildOverpassQuery(center[0], center[1], radiusM);
-
   try {
-    const { elements, partial } = await fetchOverpass(query, options?.signal);
+    const { elements, partial } = await fetchOverpassArea(
+      center[0],
+      center[1],
+      radiusKm,
+      options?.signal
+    );
 
     const seen = new Set<string>();
     const venues: Venue[] = [];
@@ -686,13 +738,11 @@ export async function fetchOsmVenueById(
   if (!match) return null;
 
   const [, osmType, osmId] = match;
-  const query = `
-[out:json][timeout:15];
-${osmType}(${osmId});
-out center tags;
-`.trim();
-
-  const { elements } = await fetchOverpass(query, signal);
+  const { elements } = await fetchOverpassByOsmId(
+    osmType as 'node' | 'way' | 'relation',
+    Number(osmId),
+    signal
+  );
   for (const el of elements) {
     const venue = elementToVenue(el);
     if (venue) return venue;
