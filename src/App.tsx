@@ -118,6 +118,7 @@ function LocatedShell() {
       center={coordinates}
       locationName={locationName || 'La tua posizione'}
       onChangeLocation={clearLocation}
+      onSelectLocation={setManualLocation}
     >
       <AppChrome>
         <LocatedRoutes />

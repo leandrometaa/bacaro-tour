@@ -22,6 +22,8 @@ interface AppContextValue {
   center: [number, number];
   locationName: string;
   onChangeLocation: () => void;
+  /** Jump to a city/address without going through the welcome picker. */
+  onSelectLocation: (coordinates: [number, number], name: string) => void;
   searchThisArea: (mapCenter: [number, number]) => void;
   resetSearchToUser: () => void;
   radius: number;
@@ -59,11 +61,13 @@ export function AppProvider({
   center: userCenter,
   locationName,
   onChangeLocation,
+  onSelectLocation,
   children,
 }: {
   center: [number, number];
   locationName: string;
   onChangeLocation: () => void;
+  onSelectLocation: (coordinates: [number, number], name: string) => void;
   children: ReactNode;
 }) {
   const [queryCenter, setQueryCenter] = useState<[number, number]>(userCenter);
@@ -190,6 +194,7 @@ export function AppProvider({
       center: queryCenter,
       locationName,
       onChangeLocation,
+      onSelectLocation,
       searchThisArea,
       resetSearchToUser,
       radius,
@@ -225,6 +230,7 @@ export function AppProvider({
       queryCenter,
       locationName,
       onChangeLocation,
+      onSelectLocation,
       searchThisArea,
       resetSearchToUser,
       radius,

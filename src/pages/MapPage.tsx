@@ -16,6 +16,7 @@ import { VenueMap } from '../components/VenueMap';
 import { VenuePreviewSheet } from '../components/VenuePreviewSheet';
 import { useAppContext } from '../context/AppContext';
 import { searchVenues } from '../data/venues';
+import { usePlaceSearch } from '../hooks/usePlaceSearch';
 import type { Venue } from '../types';
 import type { GiroPlan } from '../utils/giro';
 import { localiTrovati } from '../utils/i18n';
@@ -26,6 +27,7 @@ export function MapPage() {
     center,
     locationName,
     onChangeLocation,
+    onSelectLocation,
     searchThisArea,
     resetSearchToUser,
     radius,
@@ -56,6 +58,7 @@ export function MapPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [searchResults, setSearchResults] = useState<Venue[]>([]);
+  const { places: placeResults } = usePlaceSearch(searchQuery);
   const [previewVenue, setPreviewVenue] = useState<Venue | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [giroSheetOpen, setGiroSheetOpen] = useState(false);
@@ -136,7 +139,7 @@ export function MapPage() {
                 setShowSearch(true);
               }}
               onFocus={() => setShowSearch(true)}
-              placeholder="Cerca un locale..."
+              placeholder="Locale o zona…"
               className="w-full pl-10 pr-10 py-2.5 bg-card border border-line rounded-xl text-ink placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent shadow-sm"
             />
             {searchQuery && (
@@ -166,8 +169,41 @@ export function MapPage() {
           </button>
         </div>
 
-        {showSearch && searchResults.length > 0 && (
-          <div className="bg-card rounded-xl border border-line shadow-lg max-h-48 overflow-y-auto">
+        {showSearch &&
+          searchQuery.trim().length >= 2 &&
+          (placeResults.length > 0 || searchResults.length > 0) && (
+          <div className="bg-card rounded-xl border border-line shadow-lg max-h-64 overflow-y-auto">
+            {placeResults.length > 0 && (
+              <p className="px-4 pt-2 pb-1 text-[11px] uppercase tracking-wide text-muted">
+                Zone
+              </p>
+            )}
+            {placeResults.map((place) => (
+              <button
+                type="button"
+                key={`place-${place.coordinates[0]}-${place.coordinates[1]}-${place.name}`}
+                onClick={() => {
+                  onSelectLocation(place.coordinates, place.name);
+                  clearSearch();
+                }}
+                className="w-full text-left px-4 py-3 hover:bg-elev border-b border-line"
+              >
+                <p className="font-medium text-ink flex items-center gap-2">
+                  <MapPin size={14} className="text-primary shrink-0" />
+                  {place.name}
+                </p>
+                {place.detail && place.detail !== place.name && (
+                  <p className="text-sm text-muted truncate pl-5">
+                    {place.detail}
+                  </p>
+                )}
+              </button>
+            ))}
+            {searchResults.length > 0 && (
+              <p className="px-4 pt-2 pb-1 text-[11px] uppercase tracking-wide text-muted">
+                Locali qui
+              </p>
+            )}
             {searchResults.map((venue) => (
               <button
                 type="button"
@@ -186,9 +222,21 @@ export function MapPage() {
             ))}
           </div>
         )}
+
+        {showSearch &&
+          searchQuery.trim().length >= 2 &&
+          placeResults.length === 0 &&
+          searchResults.length === 0 && (
+          <div className="bg-card rounded-xl border border-line shadow-lg px-4 py-3">
+            <p className="text-sm text-muted">
+              Nessun locale con questo nome qui. Prova una città nelle Zone
+              rapide o tocca «{locationName}» in basso.
+            </p>
+          </div>
+        )}
       </div>
 
-      {showSearch && searchResults.length === 0 && searchQuery && (
+      {showSearch && searchQuery && (
         <div
           className="absolute inset-0 z-[5]"
           onClick={clearSearch}

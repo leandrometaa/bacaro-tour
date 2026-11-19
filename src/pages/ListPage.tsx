@@ -8,6 +8,7 @@ import { VenueCard } from '../components/VenueCard';
 import { VenueCardSkeleton } from '../components/VenueCardSkeleton';
 import { useAppContext } from '../context/AppContext';
 import { searchVenues } from '../data/venues';
+import { usePlaceSearch } from '../hooks/usePlaceSearch';
 import { useUserData } from '../hooks/useUserData';
 import type { Venue } from '../types';
 import { FEATURE_FILTERS } from '../utils/featureFilters';
@@ -33,6 +34,7 @@ export function ListPage() {
     center,
     locationName,
     onChangeLocation,
+    onSelectLocation,
     radius,
     setRadius,
     openNow,
@@ -63,6 +65,7 @@ export function ListPage() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Venue[]>([]);
+  const { places: placeResults } = usePlaceSearch(searchQuery);
   const [isSearching, setIsSearching] = useState(false);
   const [sort, setSort] = useState<ListSort>('nearby');
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -149,7 +152,7 @@ export function ListPage() {
                 setSearchQuery(e.target.value);
                 handleSearch(e.target.value);
               }}
-              placeholder="Cerca un locale..."
+              placeholder="Locale o zona…"
               className="w-full pl-10 pr-4 py-2.5 bg-app border border-line rounded-xl text-ink placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
@@ -176,6 +179,37 @@ export function ListPage() {
             <Dices size={20} />
           </button>
         </div>
+
+        {isSearching && placeResults.length > 0 && (
+          <div className="bg-app rounded-xl border border-line overflow-hidden">
+            <p className="px-3 pt-2 pb-1 text-[11px] uppercase tracking-wide text-muted">
+              Zone
+            </p>
+            {placeResults.map((place) => (
+              <button
+                type="button"
+                key={`place-${place.coordinates[0]}-${place.coordinates[1]}-${place.name}`}
+                onClick={() => {
+                  onSelectLocation(place.coordinates, place.name);
+                  setSearchQuery('');
+                  setSearchResults([]);
+                  setIsSearching(false);
+                }}
+                className="w-full text-left px-3 py-2.5 hover:bg-elev border-t border-line first:border-t-0"
+              >
+                <p className="text-sm font-medium text-ink flex items-center gap-2">
+                  <MapPin size={14} className="text-primary shrink-0" />
+                  {place.name}
+                </p>
+                {place.detail && place.detail !== place.name && (
+                  <p className="text-xs text-muted truncate pl-5">
+                    {place.detail}
+                  </p>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
 
         {!isSearching && (
           <>
