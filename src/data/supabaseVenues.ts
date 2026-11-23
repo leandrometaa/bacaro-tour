@@ -20,6 +20,27 @@ export interface SupabaseVenueRow {
   name: string | null;
   kind: string | null;
   tags: Record<string, unknown> | null;
+  /** ISO timestamp from the cache row; used for freshness. */
+  updated_at?: string | null;
+}
+
+/** Cache rows older than this are treated as stale in the UI. */
+export const SUPABASE_FRESHNESS_MS = 24 * 60 * 60 * 1000;
+
+/** True when the newest `updated_at` among rows is missing or older than the TTL. */
+export function isSupabaseResultStale(
+  rows: Pick<SupabaseVenueRow, 'updated_at'>[],
+  nowMs: number = Date.now()
+): boolean {
+  let newest: number | null = null;
+  for (const row of rows) {
+    if (!row.updated_at) continue;
+    const ts = Date.parse(row.updated_at);
+    if (!Number.isFinite(ts)) continue;
+    if (newest === null || ts > newest) newest = ts;
+  }
+  if (newest === null) return true;
+  return nowMs - newest > SUPABASE_FRESHNESS_MS;
 }
 
 const OSM_CACHE_ID_RE = /^osm:(node|way|relation)\/(\d+)$/;
@@ -111,12 +132,14 @@ export async function fetchSupabaseVenues(
   const { minLat, maxLat, minLon, maxLon } = bboxForRadius(lat, lon, radiusKm);
 
   const params = new URLSearchParams();
-  params.set('select', 'id,source,city,lat,lon,name,kind,tags');
+  params.set('select', 'id,source,city,lat,lon,name,kind,tags,updated_at');
   // PostgREST AND across lat/lon bounds (indexes on lat, lon).
+  // Prefer fresher rows when the 1000-row cap truncates a dense bbox.
   params.set(
     'and',
     `(lat.gte.${minLat},lat.lte.${maxLat},lon.gte.${minLon},lon.lte.${maxLon})`
   );
+  params.set('order', 'updated_at.desc.nullslast');
   params.set('limit', '1000');
 
   const url = `${SUPABASE_URL}/rest/v1/venues?${params.toString()}`;
@@ -166,7 +189,7 @@ export async function fetchSupabaseVenues(
     return {
       venues,
       truncated: rows.length >= 1000,
-      stale: true,
+      stale: isSupabaseResultStale(rows),
     };
   } catch (err) {
     if (err instanceof DOMException && err.name === 'AbortError') {

@@ -19,9 +19,9 @@ const MAX_RESULTS = 150;
 export const VENUE_DISPLAY_CAP = 200;
 /**
  * Proxy attempt budget. Aligns with the serverless race + fallback window
- * (maxDuration 60) so a slow-but-winning mirror can still return.
+ * (25s race + 3×8s fallback ≈ 49s, maxDuration 60) plus a small client margin.
  */
-const PROXY_TIMEOUT_MS = 55_000;
+const PROXY_TIMEOUT_MS = 52_000;
 /** Parallel browser race against public Overpass mirrors. */
 const BROWSER_RACE_TIMEOUT_MS = 30_000;
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
@@ -215,7 +215,9 @@ out center tags;
 }
 
 function isBadRemark(remark: string | undefined): boolean {
-  return Boolean(remark && /timeout|error|runtime/i.test(remark));
+  return Boolean(
+    remark && /timeout|timed\s*out|error|runtime/i.test(remark)
+  );
 }
 
 type OverpassFetchOk = {

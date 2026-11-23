@@ -39,6 +39,16 @@ on conflict (id) do update set
 
 Apply with the Supabase SQL editor or `psql` against the project database.
 
+## Refresh status
+
+This repo ships the **schema contract**, **seed SQL**, and the **read client**.
+It does **not** include a deployed Edge Function or cron that refreshes
+`public.venues` from Overpass. Until that job exists in the Supabase project,
+the table is a **static centralized cache** (seed / manual upserts), not a
+self-updating shared live cache.
+
+The client reads `updated_at` and treats rows older than 24 hours as `stale`.
+
 ## Refresh contract (Edge Function)
 
 An Edge Function (or scheduled job) should **upsert the same row shape** from Overpass:

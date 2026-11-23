@@ -3,6 +3,9 @@
  *
  * Security: never forwards arbitrary QL. Clients may only pass lat/lon/radius
  * (area search) or osmType/osmId (single element). The query is built here.
+ *
+ * Caching: CDN Cache-Control is applied only after the Overpass payload is
+ * validated. Error remarks and empty timeout responses are never cached.
  */
 
 export const config = { maxDuration: 60 };
@@ -19,10 +22,13 @@ const FALLBACK_MIRRORS = [
   'https://overpass.openstreetmap.fr/api/interpreter',
 ];
 
-/** Parallel race budget (wall clock). */
-const RACE_TIMEOUT_MS = 35_000;
-/** Per-mirror budget for sequential fallback. Worst case: 35 + 3×8 = 59s < 60. */
-const FALLBACK_TIMEOUT_MS = 8_000;
+/**
+ * Parallel race budget (wall clock). Kept well under maxDuration so fallback
+ * mirrors and Vercel overhead still fit: 25 + 3×8 = 49s < 60.
+ */
+export const RACE_TIMEOUT_MS = 25_000;
+/** Per-mirror budget for sequential fallback. */
+export const FALLBACK_TIMEOUT_MS = 8_000;
 
 const USER_AGENT =
   'BacaroTour/1.0 (+https://bacaro-tour-iota.vercel.app; OSM data consumer)';
@@ -38,6 +44,13 @@ const BOUNDS = {
 const MAX_RADIUS_KM = 30;
 const OSM_TYPES = new Set(['node', 'way', 'relation']);
 
+/** Full successful area responses — CDN may cache for an hour. */
+export const CACHE_FULL =
+  'public, s-maxage=3600, stale-while-revalidate=86400';
+/** Partial payloads (remark + some elements) — short CDN TTL only. */
+export const CACHE_PARTIAL = 'public, s-maxage=60, stale-while-revalidate=300';
+export const CACHE_NO_STORE = 'no-store';
+
 type VercelRequest = {
   method?: string;
   body?: unknown;
@@ -51,7 +64,7 @@ type VercelResponse = {
   send: (body: string) => void;
 };
 
-type MirrorOk = { ok: true; json: unknown };
+type MirrorOk = { ok: true; json: unknown; partial: boolean };
 type MirrorFail = { ok: false; error: string };
 type MirrorResult = MirrorOk | MirrorFail;
 
@@ -62,6 +75,10 @@ type OsmIdRequest = {
   osmId: number;
 };
 type ParsedRequest = AreaRequest | OsmIdRequest;
+
+export type ValidatedOverpass =
+  | { ok: true; json: Record<string, unknown>; partial: boolean }
+  | { ok: false; error: string };
 
 function asNumber(value: unknown): number | null {
   if (typeof value === 'number' && Number.isFinite(value)) return value;
@@ -184,6 +201,54 @@ out center tags;
 `.trim();
 }
 
+/** True when Overpass signals timeout / runtime / error in `remark`. */
+export function isBadRemark(remark: unknown): boolean {
+  return (
+    typeof remark === 'string' &&
+    /timeout|timed\s*out|error|runtime/i.test(remark)
+  );
+}
+
+/**
+ * Validate an Overpass JSON body before CDN caching.
+ * Empty payloads with error remarks are rejected so they never hit the edge cache.
+ */
+export function validateOverpassPayload(json: unknown): ValidatedOverpass {
+  if (!json || typeof json !== 'object' || Array.isArray(json)) {
+    return { ok: false, error: 'Invalid Overpass payload' };
+  }
+  const body = json as Record<string, unknown>;
+  if (!('elements' in body) || !Array.isArray(body.elements)) {
+    return { ok: false, error: 'Invalid Overpass payload' };
+  }
+
+  const elements = body.elements;
+  const remark = body.remark;
+  const bad = isBadRemark(remark);
+
+  if (elements.length === 0 && bad) {
+    return {
+      ok: false,
+      error:
+        typeof remark === 'string' && remark.trim()
+          ? remark
+          : 'Overpass remark without elements',
+    };
+  }
+
+  return { ok: true, json: body, partial: bad && elements.length > 0 };
+}
+
+/** Cache policy for a validated area GET response. */
+export function cacheControlForValidated(
+  method: string,
+  kind: ParsedRequest['kind'],
+  partial: boolean
+): string {
+  if (method !== 'GET' || kind !== 'area') return CACHE_NO_STORE;
+  return partial ? CACHE_PARTIAL : CACHE_FULL;
+}
+
 async function fetchMirror(
   endpoint: string,
   query: string,
@@ -217,10 +282,11 @@ async function fetchMirror(
       return { ok: false, error: `HTTP ${response.status}` };
     }
     const json = await response.json();
-    if (!json || typeof json !== 'object' || !('elements' in (json as object))) {
-      return { ok: false, error: 'Invalid Overpass payload' };
+    const validated = validateOverpassPayload(json);
+    if (!validated.ok) {
+      return { ok: false, error: validated.error };
     }
-    return { ok: true, json };
+    return { ok: true, json: validated.json, partial: validated.partial };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return { ok: false, error: message };
@@ -235,7 +301,10 @@ async function fetchMirror(
 async function raceMirrors(
   endpoints: string[],
   query: string
-): Promise<{ ok: true; json: unknown } | { ok: false; errors: string[] }> {
+): Promise<
+  | { ok: true; json: unknown; partial: boolean }
+  | { ok: false; errors: string[] }
+> {
   const controllers = endpoints.map(() => new AbortController());
   const errors: string[] = new Array(endpoints.length);
 
@@ -253,12 +322,12 @@ async function raceMirrors(
     for (let i = 0; i < controllers.length; i++) {
       if (i !== index) controllers[i].abort();
     }
-    return result.json;
+    return { json: result.json, partial: result.partial };
   });
 
   try {
-    const json = await Promise.any(attempts);
-    return { ok: true, json };
+    const winner = await Promise.any(attempts);
+    return { ok: true, json: winner.json, partial: winner.partial };
   } catch {
     return {
       ok: false,
@@ -269,7 +338,10 @@ async function raceMirrors(
 
 async function runOverpass(
   query: string
-): Promise<{ ok: true; json: unknown } | { ok: false; errors: string[] }> {
+): Promise<
+  | { ok: true; json: unknown; partial: boolean }
+  | { ok: false; errors: string[] }
+> {
   const errors: string[] = [];
   const raced = await raceMirrors(FAST_MIRRORS, query);
   if (raced.ok) return raced;
@@ -277,7 +349,9 @@ async function runOverpass(
 
   for (const mirror of FALLBACK_MIRRORS) {
     const result = await fetchMirror(mirror, query, FALLBACK_TIMEOUT_MS);
-    if (result.ok) return { ok: true, json: result.json };
+    if (result.ok) {
+      return { ok: true, json: result.json, partial: result.partial };
+    }
     errors.push(`${mirror}: ${result.error}`);
   }
 
@@ -288,20 +362,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const method = (req.method ?? 'GET').toUpperCase();
 
   if (method === 'OPTIONS') {
-    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Cache-Control', CACHE_NO_STORE);
     res.status(204).send('');
     return;
   }
 
   if (method !== 'GET' && method !== 'POST') {
-    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Cache-Control', CACHE_NO_STORE);
     res.status(405).json({ error: 'Method not allowed' });
     return;
   }
 
   const parsed = parseRequest(req);
   if ('error' in parsed) {
-    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Cache-Control', CACHE_NO_STORE);
     res.status(400).json({ error: parsed.error });
     return;
   }
@@ -311,23 +385,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ? buildAreaQuery(parsed.lat, parsed.lon, parsed.radiusKm)
       : buildOsmIdQuery(parsed.osmType, parsed.osmId);
 
-  // GET area searches are cacheable at the CDN (rounded lat/lon already).
-  if (method === 'GET' && parsed.kind === 'area') {
-    res.setHeader(
-      'Cache-Control',
-      'public, s-maxage=3600, stale-while-revalidate=86400'
-    );
-  } else {
-    res.setHeader('Cache-Control', 'no-store');
-  }
-
   const result = await runOverpass(query);
   if (result.ok) {
+    // Cache only after validation succeeded (fetchMirror already validated).
+    res.setHeader(
+      'Cache-Control',
+      cacheControlForValidated(method, parsed.kind, result.partial)
+    );
     res.status(200).json(result.json);
     return;
   }
 
-  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Cache-Control', CACHE_NO_STORE);
   res.status(502).json({
     error: 'Overpass unreachable',
     details: result.errors,

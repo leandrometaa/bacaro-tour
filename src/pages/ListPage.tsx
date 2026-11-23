@@ -106,7 +106,8 @@ export function ListPage() {
   const handleSearch = useCallback(
     (query: string) => {
       if (query.trim()) {
-        setSearchResults(searchVenues(query, venues));
+        // Search within active filters (open now, moods, etc.), not the full pool.
+        setSearchResults(searchVenues(query, filteredVenues));
         setIsSearching(true);
       } else {
         setSearchResults([]);
@@ -114,7 +115,7 @@ export function ListPage() {
       }
       setVisibleCount(PAGE_SIZE);
     },
-    [venues]
+    [filteredVenues]
   );
 
   const displayedVenues = isSearching ? searchResults : sorted;

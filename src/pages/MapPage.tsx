@@ -89,12 +89,13 @@ export function MapPage() {
   const handleSearch = useCallback(
     (query: string) => {
       if (query.trim()) {
-        setSearchResults(searchVenues(query, venues));
+        // Search within active filters (open now, moods, etc.), not the full pool.
+        setSearchResults(searchVenues(query, filteredVenues));
       } else {
         setSearchResults([]);
       }
     },
-    [venues]
+    [filteredVenues]
   );
 
   const clearSearch = () => {
