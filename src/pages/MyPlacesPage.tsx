@@ -361,6 +361,13 @@ function DiaryTab({
     return [...map.entries()];
   }, [visits]);
 
+  const summary = useMemo(() => {
+    return computeDiaryStats(
+      { version: 3, lists: [], visits, venuesById: {} },
+      getVenueById
+    );
+  }, [visits]);
+
   if (visits.length === 0) {
     return (
       <EmptyState
@@ -370,14 +377,6 @@ function DiaryTab({
       />
     );
   }
-
-  const summary = useMemo(() => {
-    const stats = computeDiaryStats(
-      { version: 3, lists: [], visits, venuesById: {} },
-      getVenueById
-    );
-    return stats;
-  }, [visits]);
 
   return (
     <>
